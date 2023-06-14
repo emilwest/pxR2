@@ -1,0 +1,19 @@
+keyword;language;varname;valname;value
+CHARSET;;;;ANSI
+CODEPAGE;;;;iso-8859-15
+AXIS-VERSION;;;;2013
+LANGUAGE;;;;sv
+CONTENTS;;;;XXXX01: titel
+STUB;;;;län,typ
+HEADING;;;;år
+TIMEVAL;;år;A1;2022
+UNITS;;;;Antal
+SUBJECT-AREA;;;;Hej
+SUBJECT-CODE;;;;XXXX
+DECIMALS;;;;0
+SOURCE;;;;Källa
+CONTACT;;;;Källa
+CREATION-DATE;;;;20230531 15:31
+NOTE;;;;Här ligger fotnoten för hela tabellen
+VALUENOTE;;län;Östergötland;Här är en specifik fotnot för Östergötland
+ELIMINATION;;län;;Riket

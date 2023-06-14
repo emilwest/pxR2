@@ -1,0 +1,18 @@
+Package: pxR2
+Type: Package
+Title: Read and Write PX Data
+Version: 0.0.0.9000
+Authors@R: 
+    person("Emil", "Westin", , "emilwestin@gmail.com", role = c("aut", "cre"))
+Description: The goal of pxR2 is to provide a faster and easier way to read 
+  and write px-data (PC-AXIS), inspired by the packages pxR and readr.
+  It is designed to correctly parse data and metadata and easy integration
+  with other px-related programs such as PXjob and PXEdit.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+LazyData: true
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
