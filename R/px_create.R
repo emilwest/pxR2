@@ -134,10 +134,16 @@ matrix_text <- xx |> matrix_to_text()
 
 
 meta_lines <- px_obj$metadata |> px_parse_metadata() |> pull(s)
+# skapa px filen med en rad per keyword + matrisen längst ner
 c(meta_lines, "DATA=", matrix_text, ";") |> write_lines("text.px")
 
-px_write <- function(.px_obj) {
 
+
+
+# TODO
+px_write <- function(.px_obj) {
+  meta_lines <- px_obj$metadata |> px_parse_metadata() |> pull(s)
+  c(meta_lines, "DATA=", matrix_text, ";") |> write_lines("text.px")
 }
 
 

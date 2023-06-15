@@ -3,8 +3,9 @@
 # install.packages("devtools")
 #install.packages(c("devtools", "roxygen2", "testthat", "knitr"))
 library(devtools)
-
+library(usethis)
 # https://r-pkgs.org/whole-game.html
+
 
 use_git()
 load_all()
