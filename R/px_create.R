@@ -22,27 +22,8 @@
 # - add various examples for creating new px files
 
 
-
-library(stringr)
-
-library(tidyverse)
-ex_data <- tibble(sex = c("Female", "Male", "Total"),
-                  age = c("0-15", "16-25", "26-50"),
-                  time = c("2021", "2022", "2023"),
-                  value = c(NA, NA, NA)
-) %>%
-  complete(sex, age, time) %>%
-  mutate(value = rnorm(27, mean = 20, sd = 5))
-
-
-
-iris
-x <- readr::read_csv2("data/metadata_example.csv",  col_types = cols(.default = "c"))
-
-x
 # creates new px object
 
-# Todo behöver TITLE läggas till?
 px_create <- function(
     .data, # mandatory. dataframe in long format with one column called 'value'
     stub, # variables to display along the rows
@@ -91,21 +72,29 @@ px_create <- function(
   # Add VALUES keywords to metadata from .data
   new_meta <- px_add_values_from_data(new_meta, .data)
 
-  # TODO:
-  # add tlist values from timeval to values
-
+  # add timval values from .data
+  new_meta <- add_timevals_from_data_to_value(new_meta, .data, "time")
 
   new_meta <- px_meta_add_keyword(new_meta, "TITLE", value = px_generate_dynamic_title(new_meta))
 
   # slutliga checks
   px_meta_validate(new_meta)
 
-  return(new_meta)
+  stubvec <-  c(stub) |> str_split(",") |> unlist()
+  headingvec <-  c(heading) |> str_split(",") |> unlist()
+  stubheading <- c(stubvec, headingvec)
+
+  data <- convert_data_to_final(new_meta, .data)
+  print(data)
+
+  return(list(metadata = new_meta,
+              data = data))
 }
 
 
-px_create(.data = ex_data,
-          stub = c("sex", "age"),
+
+px_obj <- px_create(.data = ex_data,
+          stub = "sex,age",
           heading = "time",
           time_variable = "time",
           time_scale="annual",
@@ -115,194 +104,42 @@ px_create(.data = ex_data,
           units = "Antal timmar",
           contents = "Genomsnitt antal tittartimmar av The Simpsons",
           decimals = 1
-) %>% view()
-  px_parse_metadata()
+)
+
+px_obj
 
 
 
-default_lang <- x %>%
-  filter(keyword=="LANGUAGE") %>%
-  pull(value)
 
-contents <- x %>%
-  filter(keyword=="CONTENTS") %>%
-  pull(value)
-
-x %>%
-  filter(keyword=="STUB") %>%
-  pull(value) %>%
-  str_split_1(",") %>%
-  str_c(collapse = ", ") %>%
-  str_squish()
-
-px_generate_dynamic_title <- function(.metadata_df) {
-  default_lang <- .metadata_df %>%
-    filter(keyword=="LANGUAGE") %>%
-    pull(value)
-  contents <- x %>%
-    filter(keyword=="CONTENTS") %>%
-    pull(value)
-  stub <- x %>%
-    filter(keyword=="STUB") %>%
-    pull(value) %>%
-    str_split_1(",") %>%
-    str_c(collapse = ", ") %>%
-    str_squish()
-  heading <- x %>%
-    filter(keyword=="HEADING") %>%
-    pull(value)
-
-  if (default_lang == "sv") {
-    by <- "efter"
-    and <- "och"
-  } else {
-    by <- "by"
-    and <- "and"
-  }
-
-  str_c(contents, " ", by, " ", stub, " ", and, " ", heading, ".")
-
+# TODO
+px_meta_get_stub <- function(.metadata_df) {
+  .metadata_df
 }
 
-px_generate_dynamic_title(x)
-
-
-
-
-
-levs <- ex_data %>%
-    select(-value) %>%
-    map(unique)
-
-length(levs)
-
-levs_df <- levs %>%
-  map(str_c, collapse = ",") %>%
-  as_tibble() %>%
-  pivot_longer(everything(), names_to = "varname", values_to = "value") %>%
-  mutate(keyword = "VALUES")
-
-levs %>% as_tibble()
-x
-
-px_get_values_from_data <- function(.data, as_list = FALSE) {
-  assertthat::assert_that(any(names(.data) %in% "value"),
-                          msg = "No column named value found in data frame, please add it.")
-
-  levs <- .data %>%
-    select(-value) %>%
-    map(unique)
-
-  assertthat::assert_that(length(levs)>0, msg = "Number of variables in dataframe is not greater than 0.")
-
-
-  if (as_list) {
-    return(levs)
-  } else {
-    levs %>%
-      map(str_c, collapse = ",") %>%
-      as_tibble() %>%
-      pivot_longer(everything(), names_to = "varname", values_to = "value") %>%
-      mutate(keyword = "VALUES", language = NA_character_, valname = NA_character_)
-  }
+data_to_matrix <- function(data, stubvec) {
+  m <- data |>
+    select(-all_of(stubvec)) |>
+    as.matrix()
+  colnames(m) <- NULL
+  m
 }
 
-x
-
-x %>%
-  bind_rows(px_get_values_from_data(ex_data)) %>% tail()
-
-px_get_values_from_data(ex_data)
-
-px_add_values_from_data <- function(.metadata_df, .data) {
-  vals_to_add <- px_get_values_from_data(.data)
-  px_meta_compare_varnames(.metadata_df_new = vals_to_add, .metadata_df = .metadata_df)
-
-  .metadata_df %>%
-    rows_insert(vals_to_add, by = c("keyword","language", "varname", "valname"))
+matrix_to_text <- function(m) {
+  apply(format(m), 1, paste, collapse=" ")
 }
 
-px_add_values_from_data(new_meta, ex_data)
+getwd()
+xx <- px_obj$data |> data_to_matrix(stubvec)
+matrix_text <- xx |> matrix_to_text()
 
 
-px_meta_add_keyword()
+meta_lines <- px_obj$metadata |> px_parse_metadata() |> pull(s)
+c(meta_lines, "DATA=", matrix_text, ";") |> write_lines("text.px")
 
+px_write <- function(.px_obj) {
 
-names(x)
-
-px_create(.data = ex_data,
-          stub = c("sex", "age"),
-          heading = "time",
-          time_variable = "time",
-          matrix = "TEST01",
-          subject_area = "Test",
-          subject_code = "T",
-          units = "Number",
-          contents = "Mean number of hours watching The Simpsons",
-          decimals = 1
-          )
-
-
-# --------
-
-x %>%
-  add_row
-
-
-
-
-# helper
-addquotes <- function(txt) {
-  Q <- '"'
-  str_c(Q, txt, Q)
-}
-
-# helper
-splitlist <- function(txt) {
-  str_split_1(txt, ",") %>%
-    addquotes() %>%
-    str_c(collapse=",")
 }
 
 
 
-px_parse_metadata <- function(.metadata_df) {
-
-  Q <- '"'
-  E <- ";"
-  e <- "="
-  comma <- ","
-  oq <- "("
-  eq <- ")"
-
-
-
-  .metadata_df %>%
-    mutate(value_parsed = map_chr(value, splitlist)) %>%
-    mutate(s = ifelse(is.na(varname) & is.na(valname),
-                      str_c(keyword, e, value_parsed, E),
-                      NA
-    ),
-
-    s = ifelse(!is.na(varname) & is.na(valname),
-               str_c(keyword, oq, Q, varname, Q, eq, e, value_parsed, E),
-               s
-
-    ),
-
-    s = ifelse(!is.na(varname) & !is.na(valname),
-               str_c(keyword, oq, Q, varname, Q, comma, Q, valname, Q, eq, e, value_parsed, E),
-               s
-
-
-    )
-    )
-
-}
-x
-
-x %>%
-  bind_rows(px_add_values_from_data(ex_data)) %>%
-  px_parse_metadata() %>%
-  select(s) %>% view()
 

@@ -1,19 +1,5 @@
 
 
-
-specs <- read_delim("data/px_format_specification", delim = " ", col_types = cols(.default = "c"))
-
-specs %>% map(unique)
-
-specs %>%
-  filter(Language_dependent=="Yes") %>%
-  select(Keyword) %>% view
-
-
-specs %>%
-  filter(Multiplicity == "1")
-
-
 px_meta_check_mandatory <- function(.metadata_df) {
   mandatory_vars <- specs %>%
     filter(Mandatory=="Yes") %>%
@@ -32,10 +18,6 @@ px_meta_check_mandatory <- function(.metadata_df) {
 }
 
 
-px_meta_check_mandatory(x)
-
-x
-
 px_meta_check_if_language_dependent_ok <- function(.metadata_df) {
   lang_dep <- specs %>%
     filter(Language_dependent=="Yes") %>%
@@ -52,9 +34,6 @@ px_meta_check_if_language_dependent_ok <- function(.metadata_df) {
                                       ". Change them to NA"))
 
 }
-
-px_meta_check_if_language_dependent_ok(x)
-
 
 px_meta_check_if_keywords_are_valid <- function(.metadata_df) {
   test <- .metadata_df %>%
@@ -73,12 +52,12 @@ px_meta_check_if_keywords_are_valid <- function(.metadata_df) {
                                       ))
 
 }
-
-x %>%
-  bind_rows(tibble(keyword = "HEJ")) %>%
-  px_meta_check_if_keywords_are_valid()
-
-px_meta_check_if_keywords_are_valid(x)
+#
+# x %>%
+#   bind_rows(tibble(keyword = "HEJ")) %>%
+#   px_meta_check_if_keywords_are_valid()
+#
+# px_meta_check_if_keywords_are_valid(x)
 
 
 px_meta_validate <- function(.metadata_df) {
@@ -87,7 +66,7 @@ px_meta_validate <- function(.metadata_df) {
   px_meta_check_mandatory(.metadata_df)
 }
 
-px_meta_validate(x)
+# px_meta_validate(x)
 
 get_varnames <- function(.metadata_df) {
   .metadata_df %>%
@@ -97,14 +76,14 @@ get_varnames <- function(.metadata_df) {
     unlist()
 }
 
-varnames_in_meta <- x %>% get_varnames()
-varnames_found <- x %>%
-  select(varname) %>%
-  drop_na() %>%
-  pull()
-
-setdiff(varnames_found, varnames_in_meta)
-varnames_in_meta
+#varnames_in_meta <- x %>% get_varnames()
+# varnames_found <- x %>%
+#   select(varname) %>%
+#   drop_na() %>%
+#   pull()
+#
+# setdiff(varnames_found, varnames_in_meta)
+# varnames_in_meta
 
 
 px_meta_compare_varnames <- function(.metadata_df_new, .metadata_df) {
@@ -126,4 +105,4 @@ px_meta_compare_varnames <- function(.metadata_df_new, .metadata_df) {
                           )
 }
 
-px_meta_compare_varnames(x, x)
+#px_meta_compare_varnames(x, x)

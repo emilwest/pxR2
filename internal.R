@@ -28,3 +28,8 @@ test()
 # use_package("stringr")
 use_github()
 use_readme_rmd()
+
+usethis::use_test("px_create")
+usethis::use_test("px_meta_handle")
+usethis::use_test("px_meta_validate")
+

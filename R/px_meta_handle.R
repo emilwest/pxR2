@@ -9,13 +9,6 @@ px_meta_init_unempty <- function(keyword,language,varname, valname, value) {
 }
 
 
-metadata <- px_meta_init_empty()
-
-metadata %>%
-  rows_insert(px_meta_init_unempty("h","d","d","s","s"), by = c("keyword","language", "varname", "valname")) %>%
-  rows_insert(px_meta_init_unempty("h","d","d","s2","s"), by = c("keyword","language", "varname", "valname"))
-
-
 px_meta_add_keyword <- function(
     metadata,
   keyword,
@@ -55,23 +48,6 @@ px_meta_add_keyword <- function(
   )
 
 }
-x
-
-px_meta_add_keyword(x,
-                    keyword = "ELIMINATION",
-                    language = "se",
-                    varname = "län",
-                    valname = "s",
-                    value = "s")
-
-px_meta_add_keyword(x,
-                    keyword = "MATRIX",
-                    value = "s")
-ex_data
-
-new_meta <- px_meta_init_empty()
-new_meta <- px_meta_add_keyword(new_meta, "STUB", value = "sex,age")
-new_meta <- px_meta_add_keyword(new_meta, "HEADING", value = "time")
 
 
 px_meta_add_timeval <- function(.metadata_df,
@@ -97,23 +73,4 @@ px_meta_add_timeval <- function(.metadata_df,
 
 
 
-# stub, # variables to display along the rows
-# heading, # variables to display along the columns
-# time_variable=NULL, # mandatory if time variable exist (TLIST)
-# matrix, # mandatory
-# subject_area, # mandatory
-# subject_code, # mandatory
-# units, # mandatory
-# contents, # mandatory (the title)
-# decimals = 1, # mandatory
-# showdecimals = 1,
-# language = "en",
-# charset = "ANSI",
-# axis_version = "2013",
-# codepage = "iso-8859-15",
-# creation_date = format(Sys.time(), "%Y%m%d %H:%M"),
-# last_updated = format(Sys.time(), "%Y%m%d %H:%M"),
-# contact = NULL,
-# source = NULL,
-# note = NULL
 
