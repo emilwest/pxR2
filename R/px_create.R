@@ -24,8 +24,67 @@
 
 # creates new px object
 
+#' Creates new px object from a tibble/data frame.
+#' Creates all necessary metadata and generates VALUE keywords dynamically based on the variable levels in the data frame.
+#'
+#' @param .data Mandatory. Dataframe/tibble in long format with one column called 'value'.
+#' @param stub Mandatory. Variables to display along the rows. Supply as a comma separated string, for example 'country,age,'
+#' @param heading Mandatory. Variables to display along the columns.
+#' @param time_variable Name of the time variable, if it exists.
+#' @param time_scale If time_variable exist, you must set the time scale. Choose from 'annual', 'halfyear', 'quarterly', 'monthly' or 'weekly'.
+#' Choose annual format if the time variable is formatted as CCYY (C for century, Y for year).
+#' Choose halfyear format if the time variable is formatted as CCYYH (H is 1 or 2).
+#' Choose quarterly format if the time variable is formatted as CCYYQ (Q is 1-4).
+#' Choose monthly format if the time variable is formatted as CCYYMM (M is 1-12).
+#' Choose weekly format if the time variable is formatted as CCYYWW (M is 1-52).
+#' @param matrix Mandatory. The name of the matrix, should be the same as the file name, typically in uppercase. Max length 20 characters.
+#' @param subject_area Mandatory. The name of the subject are the matrix should be categorized under.
+#' @param subject_code Mandatory. Code for the subject are. Typically upper case acronym, max length of 20 characters.
+#' @param units Mandatory. The specific type of units used in the table in plain text, for example: 'Number of applications', 'Ton', 'Index', etc.
+#' @param contents Mandatory. The first part of a title excluding the variables used.
+#' For example, if the title is 'Number of cats in Europe by country, age and time', the CONTENT is 'Number of cats in Europe'.
+#' The last part of the title, 'by country, age, and time', will be automatically generated and written to TITLE.
+#' @param decimals Mandatory. Integer between 0-15 (0-6 if SHOWDECIMALSis not included). Indicates how many decimals will be saved in the px-file.
+#' @param showdecimals The number of decimals to be shown in the table, integer between 0-6.
+#' Must be the same or smaller than the number stored as indicated by the keyword DECIMALS.
+#' If SHOWDECIMALS is not stated in the file the number stated by DECIMALS will be used.
+#' @param language The language for the px-file, 'sv' for Swedish, 'en' for English, etc.
+#' If the keyword is used, the words for “and” and “by” are read from the text file of that language which is used to generate the TITLE.
+#' @param charset CHARSET=”ANSI”; indicates that the texts in the file are written in Windows format.
+#' If the keyword is missing it means that the texts in the file are in DOS format.
+#' @param axis_version Version number for PC-Axis, deafault is the latest version 2013. Is read and saved but otherwise not used.
+#' @param codepage Is used when creating XML format to get correct characters. Default iso8859-1. Max 20 chars
+#' @param creation_date Date when file was created. Written in format CCYYMMDD hh:mm, e.g. ”19960612 14:20”. Is shown together with footnotes.
+#' @param last_updated Date and time for latest update format CCYYMMDD hh:mm. Example ”19960528 11:35”.
+#' @param contact States contact information for the matrix such as a email and is shown in the footnotes.
+#' Can for example be written in the form of: name, organization, telephone, fax, e-mail.
+#' Several persons can be stated in the same text string and are then divided by the #-sign.
+#' @param source States the organization which is responsible for the statistics or the sources used. Is shown with the footnote.
+#' If multiple sources are used, use # between each source. For example 'Statistics Sweden#Statistics Finland'.
+#' @param note General footnote for the table.
+#'
+#' @return Returns a list with two entries, one containing the metadata information and one for the data.
+#' @export
+#'
+#' @examples
+#' px_obj <- px_create(.data = ex_data,
+#'           stub = "sex,age",
+#'           heading = "time",
+#'           time_variable = "time",
+#'           time_scale="annual",
+#'           matrix = "TEST01",
+#'           subject_area = "Test",
+#'           subject_code = "T",
+#'           units = "Antal timmar",
+#'           contents = "Genomsnitt antal tittartimmar av The Simpsons",
+#'           decimals = 1,
+#'           language = "en"
+#' )
+#'
+#' px_obj
+#'
 px_create <- function(
-    .data, # mandatory. dataframe in long format with one column called 'value'
+    .data, #
     stub, # variables to display along the rows
     heading, # variables to display along the columns
     time_variable=NULL, # mandatory if time variable exist (TLIST)
@@ -92,22 +151,20 @@ px_create <- function(
 }
 
 
-
-px_obj <- px_create(.data = ex_data,
-          stub = "sex,age",
-          heading = "time",
-          time_variable = "time",
-          time_scale="annual",
-          matrix = "TEST01",
-          subject_area = "Test",
-          subject_code = "T",
-          units = "Antal timmar",
-          contents = "Genomsnitt antal tittartimmar av The Simpsons",
-          decimals = 1
-)
-
-px_obj
-
+#
+# px_obj <- px_create(.data = ex_data,
+#           stub = "sex,age",
+#           heading = "time",
+#           time_variable = "time",
+#           time_scale="annual",
+#           matrix = "TEST01",
+#           subject_area = "Test",
+#           subject_code = "T",
+#           units = "Antal timmar",
+#           contents = "Genomsnitt antal tittartimmar av The Simpsons",
+#           decimals = 1,
+#           language = "en"
+# )
 
 
 
@@ -118,7 +175,7 @@ px_meta_get_stub <- function(.metadata_df) {
 
 data_to_matrix <- function(data, stubvec) {
   m <- data |>
-    select(-all_of(stubvec)) |>
+    dplyr::select(-all_of(stubvec)) |>
     as.matrix()
   colnames(m) <- NULL
   m
@@ -128,15 +185,15 @@ matrix_to_text <- function(m) {
   apply(format(m), 1, paste, collapse=" ")
 }
 
-getwd()
-xx <- px_obj$data |> data_to_matrix(stubvec)
-matrix_text <- xx |> matrix_to_text()
-
-
-meta_lines <- px_obj$metadata |> px_parse_metadata() |> pull(s)
-# skapa px filen med en rad per keyword + matrisen längst ner
-c(meta_lines, "DATA=", matrix_text, ";") |> write_lines("text.px")
-
+# getwd()
+# xx <- px_obj$data |> data_to_matrix(stubvec)
+# matrix_text <- xx |> matrix_to_text()
+#
+#
+# meta_lines <- px_obj$metadata |> px_parse_metadata() |> pull(s)
+# # skapa px filen med en rad per keyword + matrisen längst ner
+# c(meta_lines, "DATA=", matrix_text, ";") |> write_lines("text.px")
+#
 
 
 

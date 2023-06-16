@@ -11,10 +11,19 @@ Description: The goal of pxR2 is to provide a faster and easier way to read
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
 LazyData: true
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
+Imports: 
+    cli,
+    dplyr (>= 1.1.2),
+    stringr (>= 1.5.0),
+    tidyr (>= 1.3.0),
+    glue,
+    lifecycle,
+    rlang,
+    withr

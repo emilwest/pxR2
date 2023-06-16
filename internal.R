@@ -14,7 +14,7 @@ check()
 package?readr
 package?ggplot2
 use_gpl_license()
-document()
+devtools::document()
 
 # library(pxR2)
 # helloe()
@@ -22,8 +22,11 @@ use_testthat()
 use_test("helloe") # skapar testfil för funktionen helloe
 
 library(testthat)
+
 load_all()
-test()
+devtools::document()
+devtools::test()
+
 
 
 # use_package("stringr")
@@ -33,4 +36,13 @@ use_readme_rmd()
 usethis::use_test("px_create")
 usethis::use_test("px_meta_handle")
 usethis::use_test("px_meta_validate")
+
+usethis::use_tidy_dependencies()
+
+usethis::use_package("dplyr", type = "Imports", min_version = "1.1.2")
+
+?dplyr
+
+
+
 

@@ -1,11 +1,11 @@
 
 
 px_meta_init_empty <- function() {
-  tibble(keyword=character(),  language=character(), varname=character(),  valname=character(),  value=character())
+  dplyr::tibble(keyword=character(),  language=character(), varname=character(),  valname=character(),  value=character())
 }
 
 px_meta_init_unempty <- function(keyword,language,varname, valname, value) {
-  tibble(keyword=keyword,  language=language, varname=varname,  valname=valname,  value=value)
+  dplyr::tibble(keyword=keyword,  language=language, varname=varname,  valname=valname,  value=value)
 }
 
 
@@ -39,7 +39,7 @@ px_meta_add_keyword <- function(
 
   tryCatch(
     metadata %>%
-      rows_insert(to_add, by = c("keyword","language", "varname", "valname"))
+      dplyr::rows_insert(to_add, by = c("keyword","language", "varname", "valname"))
     ,
     error=function(e) {
       message('metadata already exist')
@@ -55,7 +55,8 @@ px_meta_add_timeval <- function(.metadata_df,
                         time_scale # A1/annual, H1/halfyear, Q1/quarterly, M1 monthly, W1/weekly
 ) {
 
-  time_scale <- case_when(
+
+  time_scale <- dplyr::case_when(
     time_scale == "annual" ~ "A1",
     time_scale == "halfyear" ~ "H1",
     time_scale == "quarterly" ~ "Q1",

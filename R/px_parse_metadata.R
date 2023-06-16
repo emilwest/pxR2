@@ -24,8 +24,8 @@ px_parse_metadata <- function(.metadata_df) {
   eq <- ")"
 
   .metadata_df %>%
-    mutate(value_parsed = map_chr(value, splitlist)) %>%
-    mutate(s = ifelse(is.na(varname) & is.na(valname),
+    dplyr::mutate(value_parsed = map_chr(value, splitlist)) %>%
+    dplyr::mutate(s = ifelse(is.na(varname) & is.na(valname),
                       str_c(keyword, e, value_parsed, E),
                       NA
     ),
@@ -51,6 +51,6 @@ px_parse_metadata <- function(.metadata_df) {
                )
 
     ) |>
-    select(s)
+    dplyr::select(s)
 
 }

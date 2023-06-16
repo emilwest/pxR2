@@ -2,12 +2,12 @@
 
 px_meta_check_mandatory <- function(.metadata_df) {
   mandatory_vars <- specs %>%
-    filter(Mandatory=="Yes") %>%
-    filter(Keyword!="DATA") %>%
-    select(Keyword)
+    dplyr::filter(Mandatory=="Yes") %>%
+    dplyr::filter(Keyword!="DATA") %>%
+    dplyr::select(Keyword)
 
   missing <- mandatory_vars %>%
-    anti_join(.metadata_df, by = c("Keyword" = "keyword"))
+    dplyr::anti_join(.metadata_df, by = c("Keyword" = "keyword"))
   missing_in_text <- str_c(pull(missing), collapse = ", ")
 
   assertthat::assert_that(nrow(missing)== 0,
@@ -20,12 +20,12 @@ px_meta_check_mandatory <- function(.metadata_df) {
 
 px_meta_check_if_language_dependent_ok <- function(.metadata_df) {
   lang_dep <- specs %>%
-    filter(Language_dependent=="Yes") %>%
-    select(Keyword)
+    dplyr::filter(Language_dependent=="Yes") %>%
+    dplyr::select(Keyword)
 
   should_not_have_language <- .metadata_df %>%
-    anti_join(lang_dep, by = c("keyword" = "Keyword")) %>%
-    filter(!is.na(language))
+    dplyr::anti_join(lang_dep, by = c("keyword" = "Keyword")) %>%
+    dplyr::filter(!is.na(language))
   should_not_have_language_text <- str_c(pull(should_not_have_language), collapse = ", ")
 
   assertthat::assert_that(nrow(should_not_have_language)== 0,
@@ -37,8 +37,8 @@ px_meta_check_if_language_dependent_ok <- function(.metadata_df) {
 
 px_meta_check_if_keywords_are_valid <- function(.metadata_df) {
   test <- .metadata_df %>%
-    select(keyword) %>%
-    anti_join(specs %>% select(keyword = Keyword), by = "keyword")
+    dplyr::select(keyword) %>%
+    dplyr::anti_join(specs %>% select(keyword = Keyword), by = "keyword")
   if (nrow(test) > 0) {
     unkown_keywords <- str_c(pull(test), collapse = ", ")
   }
@@ -70,15 +70,15 @@ px_meta_validate <- function(.metadata_df) {
 
 get_varnames <- function(.metadata_df) {
   .metadata_df %>%
-    filter(keyword %in% c("STUB", "HEADING")) %>%
-    pull(value) %>%
+    dplyr::filter(keyword %in% c("STUB", "HEADING")) %>%
+    dplyr::pull(value) %>%
     str_split(",") %>%
     unlist()
 }
 
 #varnames_in_meta <- x %>% get_varnames()
 # varnames_found <- x %>%
-#   select(varname) %>%
+#   dplyr::select(varname) %>%
 #   drop_na() %>%
 #   pull()
 #
@@ -89,9 +89,9 @@ get_varnames <- function(.metadata_df) {
 px_meta_compare_varnames <- function(.metadata_df_new, .metadata_df) {
   varnames_in_meta <- .metadata_df %>% get_varnames()
   varnames_found <- .metadata_df_new %>%
-    select(varname) %>%
+    dplyr::select(varname) %>%
     drop_na() %>%
-    pull()
+    dplyr::pull()
 
   l <- setdiff(varnames_found, varnames_in_meta)
   xx <- str_c(varnames_in_meta, collapse = ", ")

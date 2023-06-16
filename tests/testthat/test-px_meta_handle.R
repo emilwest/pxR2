@@ -1,12 +1,12 @@
 
 
 test_that("empty metadata tibble is returned", {
-  expect_equal(px_meta_init_empty(),  tibble(keyword=character(),  language=character(), varname=character(),  valname=character(),  value=character()))
+  expect_equal(px_meta_init_empty(),  dplyr::tibble(keyword=character(),  language=character(), varname=character(),  valname=character(),  value=character()))
 })
 
 
 test_that("same tibble is returned", {
-  expect_equal(px_meta_init_unempty("VALUENOTE", "sv", "län", "Östergötland", "hej"),  tibble(keyword="VALUENOTE",  language="sv", varname="län",  valname = "Östergötland",  value = "hej"))
+  expect_equal(px_meta_init_unempty("VALUENOTE", "sv", "län", "Östergötland", "hej"),  dplyr::tibble(keyword="VALUENOTE",  language="sv", varname="län",  valname = "Östergötland",  value = "hej"))
 })
 
 
