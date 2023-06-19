@@ -4,6 +4,7 @@
 ## usethis namespace: start
 #' @import rlang
 #' @import dplyr
+#' @import stringr
 #' @importFrom glue glue
 #' @importFrom lifecycle deprecated
 #' @importFrom dplyr select

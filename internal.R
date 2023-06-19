@@ -26,9 +26,11 @@ library(testthat)
 load_all()
 devtools::document()
 devtools::test()
+devtools::build()
 
-
-
+?pxR2::px_parse_metadata
+?pxR2::px_create
+?pxR2::px_create()
 # use_package("stringr")
 use_github()
 use_readme_rmd()
