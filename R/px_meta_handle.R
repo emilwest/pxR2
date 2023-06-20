@@ -1,14 +1,56 @@
 
 
+#' Initialize empty px metadata tibble
+#'
+#' @return Returns empty px metadata tibble
+#' @export
+#'
+#' @examples
+#' px_meta_init_empty()
 px_meta_init_empty <- function() {
   dplyr::tibble(keyword=character(),  language=character(), varname=character(),  valname=character(),  value=character())
 }
 
-px_meta_init_unempty <- function(keyword,language,varname, valname, value) {
-  dplyr::tibble(keyword=keyword,  language=language, varname=varname,  valname=valname,  value=value)
+#' Initialize nonempty px metadata tibble with arguments
+#'
+#' @param keyword Mandatory. PX keyword in capital letters.
+#' @param language Language code, for example 'en', 'sv', etc.
+#' @param varname Name of variable you want to comment.
+#' @param valname Name of the value you want to comment.
+#' @param value Mandatory. The text you want to add.
+#'
+#' @return Filled px metadata tibble
+#' @export
+#'
+#' @examples
+#' px_meta_init_unempty("VALUENOTE", "", "age", "15-20 years", "Preliminary figures")
+#' # will throw error if keyword is not valid according to PX Specifications:
+#' px_meta_init_unempty("HEJ", "", "age", "15-20 years", "Preliminary figures")
+px_meta_init_unempty <- function(keyword,
+                                 language,
+                                 varname,
+                                 valname,
+                                 value) {
+  toadd <- dplyr::tibble(keyword=keyword,  language=language, varname=varname,  valname=valname,  value=value)
+  px_meta_check_if_keywords_are_valid(toadd)
+  return(toadd)
 }
 
 
+#' Add new row of keywords to metadata tibble
+#'
+#' @param metadata Metadata tibble to add to.
+#' @param keyword Mandatory. PX keyword in capital letters.
+#' @param language Language code, for example 'en', 'sv', etc.
+#' @param varname Name of variable you want to comment.
+#' @param valname Name of the value you want to comment.
+#' @param value Mandatory. The text you want to add.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' px_meta_add_keyword(meta_example, "VALUENOTE", "", "age", "15-20 years", "Preliminary figures")
 px_meta_add_keyword <- function(
     metadata,
   keyword,
@@ -24,9 +66,6 @@ px_meta_add_keyword <- function(
                                  valname = valname,
                                  value =value
   )
-
-  # denna check körs alltid
-  px_meta_check_if_keywords_are_valid(to_add)
 
   if (!is.na(varname)) {
     px_meta_compare_varnames(to_add, metadata)
@@ -50,6 +89,22 @@ px_meta_add_keyword <- function(
 }
 
 
+
+#' Add time value information to px metadata tibble
+#'
+#' @param .metadata_df  Metadata tibble to add to.
+#' @param time_variable Name of variable containing time info, for example 'time', 'år', etc.
+#' @param time_scale Choose from 'annual', 'halfyear', 'quarterly', 'monthly', 'weekly'.
+#' Choose annual format if the time variable is formatted as CCYY (C for century, Y for year).
+#' Choose halfyear format if the time variable is formatted as CCYYH (H is 1 or 2).
+#' Choose quarterly format if the time variable is formatted as CCYYQ (Q is 1-4).
+#' Choose monthly format if the time variable is formatted as CCYYMM (M is 1-12).
+#' Choose weekly format if the time variable is formatted as CCYYWW (M is 1-52).
+#'
+#' @return
+#' @export
+#'
+#' @examples
 px_meta_add_timeval <- function(.metadata_df,
                         time_variable,
                         time_scale # A1/annual, H1/halfyear, Q1/quarterly, M1 monthly, W1/weekly
