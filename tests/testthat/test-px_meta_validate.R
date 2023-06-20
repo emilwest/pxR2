@@ -25,12 +25,12 @@ test_that("error throws if any px validation check fails", {
 
 
 test_that("error is thrown if any variable name in varname column of .px_metadata_new is not found in STUB or HEADING of .px_metadata", {
-  testthat::expect_error(px_meta_compare_varnames(px_meta_init_unempty("ELIMINATIOn","d","hej","s","s"), meta_example))
+  testthat::expect_error(px_meta_compare_varnames(px_meta_init_unempty("ELIMINATION","d","hej","s","s"), meta_example))
 })
 
 
 test_that("variable name in varname column of .px_metadata_new is found in STUB or HEADING of .px_metadata", {
-  testthat::expect_true(px_meta_compare_varnames(px_meta_init_unempty("ELIMINATIOn","d","län","s","s"), meta_example))
+  testthat::expect_true(px_meta_compare_varnames(px_meta_init_unempty("ELIMINATION","d","län","s","s"), meta_example))
 })
 
 

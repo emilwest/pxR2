@@ -5,6 +5,7 @@
 #' @import rlang
 #' @import dplyr
 #' @import stringr
+#' @import tidyr
 #' @importFrom glue glue
 #' @importFrom lifecycle deprecated
 #' @importFrom dplyr select

@@ -24,6 +24,7 @@ px_meta_init_empty <- function() {
 #'
 #' @examples
 #' px_meta_init_unempty("VALUENOTE", "", "age", "15-20 years", "Preliminary figures")
+#' px_meta_init_unempty("valuenote", "", "age", "15-20 years", "Preliminary figures")
 #' # will throw error if keyword is not valid according to PX Specifications:
 #' px_meta_init_unempty("HEJ", "", "age", "15-20 years", "Preliminary figures")
 px_meta_init_unempty <- function(keyword,
@@ -31,7 +32,7 @@ px_meta_init_unempty <- function(keyword,
                                  varname,
                                  valname,
                                  value) {
-  toadd <- dplyr::tibble(keyword=keyword,  language=language, varname=varname,  valname=valname,  value=value)
+  toadd <- dplyr::tibble(keyword=toupper(keyword),  language=language, varname=varname,  valname=valname,  value=value)
   px_meta_check_if_keywords_are_valid(toadd)
   return(toadd)
 }
@@ -46,7 +47,7 @@ px_meta_init_unempty <- function(keyword,
 #' @param valname Name of the value you want to comment.
 #' @param value Mandatory. The text you want to add.
 #'
-#' @return
+#' @return Metadata tibble
 #' @export
 #'
 #' @examples
@@ -101,10 +102,11 @@ px_meta_add_keyword <- function(
 #' Choose monthly format if the time variable is formatted as CCYYMM (M is 1-12).
 #' Choose weekly format if the time variable is formatted as CCYYWW (M is 1-52).
 #'
-#' @return
+#' @return Metadata tibble
 #' @export
 #'
 #' @examples
+#'
 px_meta_add_timeval <- function(.metadata_df,
                         time_variable,
                         time_scale # A1/annual, H1/halfyear, Q1/quarterly, M1 monthly, W1/weekly
