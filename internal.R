@@ -39,6 +39,9 @@ usethis::use_test("px_create")
 usethis::use_test("px_meta_handle")
 usethis::use_test("px_meta_validate")
 
+
+usethis::use_logo(img = "man/figures/pxR2_original.png")
+
 usethis::use_tidy_dependencies()
 
 usethis::use_package("dplyr", type = "Imports", min_version = "1.1.2")
