@@ -26,4 +26,7 @@ Imports:
     glue,
     lifecycle,
     rlang,
-    withr
+    withr,
+    Rcpp
+LinkingTo: 
+    Rcpp

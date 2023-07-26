@@ -2,12 +2,14 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @import rlang
 #' @import dplyr
+#' @import rlang
 #' @import stringr
 #' @import tidyr
+#' @importFrom dplyr select
 #' @importFrom glue glue
 #' @importFrom lifecycle deprecated
-#' @importFrom dplyr select
+#' @importFrom Rcpp sourceCpp
+#' @useDynLib pxR2, .registration = TRUE
 ## usethis namespace: end
 NULL

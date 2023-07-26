@@ -8,7 +8,7 @@ library(usethis)
 
 
 use_git()
-load_all()
+devtools::load_all()
 hello()
 check()
 package?readr
@@ -38,7 +38,11 @@ use_readme_rmd()
 usethis::use_test("px_create")
 usethis::use_test("px_meta_handle")
 usethis::use_test("px_meta_validate")
+usethis::use_test("px_meta_validate")
+usethis::use_test("parse_px_meta_string")
+usethis::use_rcpp()
 
+#parse_px_meta_string()
 
 usethis::use_logo(img = "man/figures/pxR2_original.png")
 
