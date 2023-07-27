@@ -272,6 +272,11 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
                 throw Rcpp::exception("Invalid PX file, timeval value opens with \" and ends with ; but does not have a closing \" before ;", false);
               }
 
+              // lägg in check här? om values.empty() och
+              // c == END_VALUES och
+              // sb[sb.length() - 1] != FNUTT, ge error om att closing " saknas?
+
+
               sb += c;
             }
             break;
@@ -360,6 +365,7 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
           case END_VALUES:
             // save string to values
             values.push_back(sb);
+
 
 
             // Remove start/ending FNUTT
@@ -492,31 +498,6 @@ parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\",\"1969\",\"1970\";")
 parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\"-\"1970\";")
 
 */
-
-
-// bör faila
-/*** R
-parse_px_meta_string("CHARSET[en=\"ANSI\";")
-parse_px_meta_string("CHARSET[en)=\"ANSI\";")
-parse_px_meta_string("CHARSET[en\")=\"ANSI\";")
-parse_px_meta_string("CHARSET;")
-parse_px_meta_string("CHARSET]")
-parse_px_meta_string("CHARSET)")
-
-
-parse_px_meta_string("STUB=\"age\",\"sex\",\"gender;")
-
-parse_px_meta_string("CODES(\"age\")=\"0-19\",\"20-39\")\"40-100\";") # ger error
-parse_px_meta_string("CODES(\"age\")=\"0-19\"-\"40-100\";") # ger error
-
-
-parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\",\"1969\",\"1970;") # ger error
-parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1970;") # ger error
-parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968,\"1969\";") # bör ge error
-
-
-*/
-
 
 
 // borde faila men gör inte det
