@@ -201,13 +201,17 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
         }
         else {
           //subkey = sb;
-          if (debug) {
-            std::cout << "added: " << sb << " to subkey, all subkeys read."
-                      << '\n';
-          }
 
-          subkeys.push_back(sb);
-          sb.clear();
+            if (debug) {
+              std::cout << "added: " << sb << " to subkey, all subkeys read."
+                        << '\n';
+            }
+
+            subkeys.push_back(sb);
+            sb.clear();
+
+
+
 
           // obs endast om vi använder subkey som string
           // dubbelkollar att senaste tecken inte var , och tar bort detta
@@ -480,6 +484,10 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
 
   }
 
+  if (values.size() == 0) {
+    Rcpp::stop("The value could not be found, check that there is not any missing closing quote \" at the end.");
+  }
+
 
   std::cout << "keyword:" << keyword << '\n';
   std::cout << "language:" << language << '\n';
@@ -521,7 +529,8 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
 /*** R
 
 # devtools::load_all()
-parse_px_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";")
+# todo fixa denna
+parse_px_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";",T)
 y <- parse_px_meta_string("CHARSET=\"ANSI\";")
 x <- parse_px_meta_string("CHARSET[en]=\"ANSI\";")
 str(x)
@@ -555,7 +564,5 @@ parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\"-\"1970\";")
 // borde faila men gör inte det
 
 /***R
-parse_px_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not applicable;hej;") # borde ge error
-parse_px_meta_string("KEYS(\"age\")=\"VALUES;") # ska ge error
 parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1,\"1968\"-\"1970\")-;")
 */

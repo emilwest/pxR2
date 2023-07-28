@@ -55,4 +55,6 @@ test_that("error returns if there is no closing/beginning quotes between two val
 # </non-closing quotes>
 # ----------------
 
-
+# lägg till dessa
+parse_px_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not applicable;hej;")
+parse_px_meta_string("KEYS(\"age\")=\"VALUES;")
