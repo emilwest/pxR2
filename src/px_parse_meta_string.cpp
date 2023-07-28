@@ -4,7 +4,7 @@
 
 
 // [[Rcpp::export]]
-bool parse_px_meta_string(std::string& line, bool debug=false) {
+Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
 
   const char FNUTT = '\"';
   const char START_LANGUAGE = '[';
@@ -26,7 +26,7 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
   std::string language;
   std::string subkey;
   std::vector<std::string> values;
-
+  std::vector<std::string> subkeys; // prova subkey som vec ist för string
 
   enum ParserState {
     ReadKeyword = 0,
@@ -47,14 +47,6 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
 
   ValueType valueType = ValueType::NotSet;
 
-  // std::map<std::string, ValueType> valueTypesMap = {
-  //   {"NotSet", ValueType::NotSet},
-  //   {"FnuttValue", ValueType::FnuttValue},
-  //   {"NoFnuttValue", ValueType::NoFnuttValue},
-  //   {"ErrorValue", ValueType::ErrorValue}
-  // };
-
-
   std::string sb; // where we save characters to
   std::string errorhelp; // error help string in the value parser
 
@@ -65,8 +57,6 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
   //std::string line;
 
   for(char& c : line) {
-    //std::cout << c << state << '\n';
-
     if (c == FNUTT) {
       InFnutt = !InFnutt;
     }
@@ -77,6 +67,17 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
 
     case ParserState::ReadKeyword:
       //std::cout << "inside readkeyword:" << state << '\n';
+
+      if (debug) {
+        std::cout << "c: " << c << " InFnutt: " << InFnutt <<
+          " keyword " << keyword <<
+          " language: " << language <<
+            " subkeys.size(): " << subkeys.size() <<
+              " values.size(): " << values.size() <<
+            " state: " << state <<
+              '\n';
+      }
+
       switch(c) {
         case FNUTT:
           break;
@@ -135,6 +136,14 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
       break; // end ParserState::ReadKeyword
 
     case ParserState::ReadLanguage:
+
+      if (debug) {
+        std::cout << "c: " << c << " InFnutt: " << InFnutt <<
+          " language: " << language <<
+            " state: " << state <<
+              '\n';
+      }
+
       if (std::isspace(c)) {
         throw Rcpp::exception("Invalid PX file, remove whitespace from inside the language tags []", false);
       }
@@ -157,30 +166,56 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
       break; // end ParserState::ReadLanguage
 
     case ParserState::ReadSubkeys:
+
+      if (debug) {
+        std::cout << "c: " << c << " InFnutt: " << InFnutt <<
+          " subkeys.empty(): " << subkeys.empty() <<
+            " state: " << state <<
+            '\n';
+      }
+
       switch (c) {
       case FNUTT:
-        sb += c;
+        // if (InFnutt) {
+        //   sb += c;
+        // }
         break;
-      case END_SUBKEY:
-
-
-
-
-
+      case COMMA:
         if (InFnutt) {
           sb += c;
         }
         else {
-          subkey = sb;
+          // comma means a new subkeys comes after, so add and clear sb for parsing next subkeys
+          if (debug) {
+            std::cout << "added: " << sb << " to subkey"
+                      << '\n';
+          }
+          subkeys.push_back(sb);
+          sb.clear();
+          state = ParserState::ReadSubkeys;
+        }
+        break;
+      case END_SUBKEY:
+        if (InFnutt) {
+          sb += c;
+        }
+        else {
+          //subkey = sb;
+          if (debug) {
+            std::cout << "added: " << sb << " to subkey, all subkeys read."
+                      << '\n';
+          }
+
+          subkeys.push_back(sb);
           sb.clear();
 
+          // obs endast om vi använder subkey som string
           // dubbelkollar att senaste tecken inte var , och tar bort detta
           // tex CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\",) blir
           // tex CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")
-          if (!subkey.empty() && subkey[subkey.length() - 1] == ',') {
-            subkey = subkey.substr(0, subkey.length() - 1);
-          }
-
+          // if (!subkey.empty() && subkey[subkey.length() - 1] == ',') {
+          //   subkey = subkey.substr(0, subkey.length() - 1);
+          // }
 
           state = ParserState::ReadKeyword;
         }
@@ -230,9 +265,9 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
             ;
 
           values.clear();
-          values.push_back(keyword);
-          values.push_back(language);
-          values.push_back(subkey);
+          // values.push_back(keyword);
+          // values.push_back(language);
+          // values.push_back(subkey);
 
           stop(error_message);
 
@@ -289,6 +324,8 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
             "says it is inside an open quote \" despite the valuetype indicating it isn't. \n"
             "Please double check the format. \n";
 
+            break;
+          case ValueType::ErrorValue:
             break;
           }
         } else {
@@ -369,12 +406,12 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
 
 
             // Remove start/ending FNUTT
-            if (!subkey.empty() && subkey[0] == FNUTT) {
-              subkey = subkey.substr(1);
-            }
-            if (!subkey.empty() && subkey[subkey.length() - 1] == FNUTT) {
-              subkey = subkey.substr(0, subkey.length() - 1);
-            }
+            // if (!subkey.empty() && subkey[0] == FNUTT) {
+            //   subkey = subkey.substr(1);
+            // }
+            // if (!subkey.empty() && subkey[subkey.length() - 1] == FNUTT) {
+            //   subkey = subkey.substr(0, subkey.length() - 1);
+            // }
 
             // restore states (if in while-loop)
             // keyword.clear();
@@ -413,6 +450,8 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
               "This is probably due to that previous value closed with \" but with no comma (,) afterwards. \n"
               "Solution: A \" and/or , is missing between the values, please add it. \n";
 
+              break;
+            case ValueType::ErrorValue:
               break;
             }
 
@@ -465,29 +504,42 @@ bool parse_px_meta_string(std::string& line, bool debug=false) {
   //
   // }
   //infile.close();
-  return true;
+  //return true;
+
+  return Rcpp::List::create(Rcpp::Named("keyword") = keyword,
+                                    Rcpp::Named("language") = language,
+                                    Rcpp::Named("subkeys") = subkeys,
+                                    Rcpp::Named("values") = values
+  );
+
+
 }
 
 
 
 // tests
 /*** R
-parse_px_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";")
-parse_px_meta_string("CHARSET=\"ANSI\";")
-parse_px_meta_string("CHARSET[en]=\"ANSI\";")
 
+# devtools::load_all()
+parse_px_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";")
+y <- parse_px_meta_string("CHARSET=\"ANSI\";")
+x <- parse_px_meta_string("CHARSET[en]=\"ANSI\";")
+str(x)
+as_tibble(x)
+
+bind_rows(x,y)
 
 parse_px_meta_string("VALUENOTE[sv](\"Norway\")=\"Break in time series\";")
-parse_px_meta_string("VALUENOTE[sv](\"Norway\",\"Oslo\")=\"Break in time series\";")
+parse_px_meta_string("VALUENOTE[sv](\"Norway\",\"Oslo\")=\"Break in time series\";", T)
 parse_px_meta_string("ELIMINATION(\"kön\")=YES;")
 
 parse_px_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not applicable\";")
 parse_px_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";")
 
-parse_px_meta_string("STUB=\"age\",\"sex\",\"gender\";")
+parse_px_meta_string("STUB=\"age\",\"sex\",\"gender\";", T)
 parse_px_meta_string("SOURCE=\"Statistics Sweden#Statistics Finland\";")
 
-parse_px_meta_string("VALUES(\"age\")=\"0-19\",\"20-39\",\"40-100\";")
+parse_px_meta_string("VALUES(\"age\")=\"0-19\",\"20-39\",\"40-100\";",T)
 parse_px_meta_string("CODES(\"age\")=\"0-19\",\"20-39\",\"40-100\";")
 
 parse_px_meta_string("KEYS(\"age\")=\"VALUES\"\n\"hej\";")
