@@ -11,7 +11,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // parse_px_meta_string
-bool parse_px_meta_string(std::string& line, bool debug);
+Rcpp::List parse_px_meta_string(std::string& line, bool debug);
 RcppExport SEXP _pxR2_parse_px_meta_string(SEXP lineSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

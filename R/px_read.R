@@ -1,27 +1,38 @@
 #' library(tidyverse)
 #'
 #'
-#' px_read <- function(file,
-#'                     encoding="guess"
-#' ) {
 #'
-#'   if (encoding == "guess") {
-#'     guess <- readr::guess_encoding(file)
-#'     encoding <- guess[1,1][[1]]
-#'     print(paste("Guessed encoding:", encoding))
-#'   } else {
-#'     print(paste("Encoding:", encoding))
-#'   }
-#'
-#'   y <- readr::read_file(file = file, locale = locale(encoding = encoding))
-#'   y1 <- stringr::str_split_1(y, "DATA=\\r\\n")
-#'   meta <- y1[1] # metadata-part
-#'   mat <- y1[2] # matrix/data-part
-#'
-#'   return(meta)
-#' }
-#'
-#' x <- px_read("inst/extdata/WORK02.px", encoding = "UTF-8")
+px_read <- function(file,
+                    encoding="guess"
+) {
+
+  if (encoding == "guess") {
+    guess <- readr::guess_encoding(file)
+    encoding <- guess[1,1][[1]]
+    print(paste("Guessed encoding:", encoding))
+  } else {
+    print(paste("Encoding:", encoding))
+  }
+
+  y <- readr::read_file(file = file, locale = readr::locale(encoding = encoding))
+  y1 <- stringr::str_split_1(y, "DATA=\\r\\n")
+  meta <- y1[1] # metadata-part
+
+
+ # mat <- y1[2] # matrix/data-part
+
+  return(meta)
+}
+
+
+# x <- px_read("inst/extdata/WORK02.px", encoding = "UTF-8")
+#
+# str(x)
+# devtools::load_all()
+# px_parse_meta_string(x)
+
+
+
 #' x <- px_read("inst/extdata/WORK02.px")
 #' x[1]
 #'

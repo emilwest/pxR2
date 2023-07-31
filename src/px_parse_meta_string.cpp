@@ -4,7 +4,7 @@
 
 
 // [[Rcpp::export]]
-Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
+Rcpp::List px_parse_meta_string(std::string& line, bool debug=false) {
 
   const char FNUTT = '\"';
   const char START_LANGUAGE = '[';
@@ -24,9 +24,8 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
 
   std::string keyword;
   std::string language;
-  std::string subkey;
   std::vector<std::string> values;
-  std::vector<std::string> subkeys; // prova subkey som vec ist för string
+  std::vector<std::string> subkeys;
 
   enum ParserState {
     ReadKeyword = 0,
@@ -59,6 +58,10 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
   for(char& c : line) {
     if (c == FNUTT) {
       InFnutt = !InFnutt;
+    }
+
+    if (keyword == "DATA") {
+      break;
     }
 
     // switch through the four states:
@@ -202,6 +205,10 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
         else {
           //subkey = sb;
 
+          // kontrollerar så att fall som CELLNOTE("age","gender",)="...";
+          // inte lägger till det sista , som subkey
+          //if (sb[sb.length()] != ',') {
+          if (sb.length() > 0) {
             if (debug) {
               std::cout << "added: " << sb << " to subkey, all subkeys read."
                         << '\n';
@@ -209,18 +216,13 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
 
             subkeys.push_back(sb);
             sb.clear();
-
-
-
-
-          // obs endast om vi använder subkey som string
-          // dubbelkollar att senaste tecken inte var , och tar bort detta
-          // tex CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\",) blir
-          // tex CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")
-          // if (!subkey.empty() && subkey[subkey.length() - 1] == ',') {
-          //   subkey = subkey.substr(0, subkey.length() - 1);
-          // }
-
+          } else {
+            if (debug) {
+              std::cout << "did not add: " << sb <<
+                " to subkey, since sb is empty. Probably the last character was a , before END_SUBKEY." <<
+                  " Only subkeys within quotes will be added." << '\n';
+            }
+          }
           state = ParserState::ReadKeyword;
         }
         break;
@@ -258,10 +260,12 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
           // convert values vector to string
           std::string s;
           for (const auto &piece : values) s += piece;
+          std::string ss;
+          for (const auto &piece : subkeys) ss += piece;
 
           Rcpp::String error_message = std::string("Failed parsing value at  keyword = '") + keyword +
             std::string("', language = '") + language +
-            std::string("', subkey = '") + subkey +
+            std::string("', subkey = '") + ss +
             std::string("'.\nCurrent parsed value string: '") + sb +
             std::string("'.\nAll parsed values before: ") + s +
             std::string("'.\nAdditional error message: \n") +
@@ -378,9 +382,12 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
               "For example, this is allowed: TIMEVAL(\"time\")=TLIST(A1, \"1994\"-\"1996\"); \n"
               "Solution: replace '-' with ',' or check format. \n";
 
+              std::string ss;
+              for (const auto &piece : subkeys) ss += piece;
+
               Rcpp::String error_message = std::string("Failed parsing value at  keyword = '") + keyword +
                 std::string("', language = '") + language +
-                std::string("', subkey = '") + subkey +
+                std::string("', subkey = '") + ss +
                 std::string("'.\nCurrent parsed value string: '") + sb +
                 std::string("'.\nAdditional error message: \n") +
                 errorhelp
@@ -406,16 +413,6 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
           case END_VALUES:
             // save string to values
             values.push_back(sb);
-
-
-
-            // Remove start/ending FNUTT
-            // if (!subkey.empty() && subkey[0] == FNUTT) {
-            //   subkey = subkey.substr(1);
-            // }
-            // if (!subkey.empty() && subkey[subkey.length() - 1] == FNUTT) {
-            //   subkey = subkey.substr(0, subkey.length() - 1);
-            // }
 
             // restore states (if in while-loop)
             // keyword.clear();
@@ -458,69 +455,24 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
             case ValueType::ErrorValue:
               break;
             }
-
-
-
-
           }
-
-
-
         }
-
-
-
       }
-
-
-
-      //std::cout << c; //debug
       break; // end ParserState::ReadValues
-
-
     }
-
-
-
   }
 
-  if (values.size() == 0) {
-    Rcpp::stop("The value could not be found, check that there is not any missing closing quote \" at the end.");
+  if (values.size() == 0 && keyword != "DATA") {
+    Rcpp::stop("A value could not be found, check that there is not any missing closing quote \" at the end.");
   }
-
-
-  std::cout << "keyword:" << keyword << '\n';
-  std::cout << "language:" << language << '\n';
-  std::cout << "subkey:" << subkey << '\n';
-  std::cout << "values (" << values.size() << "):";
-  for (auto element : values) {
-    std::cout << element << " ";
+  if (keyword.size() == 0) {
+    Rcpp::stop("A keyword could not be found, check the format of the metadata.");
   }
-  std::cout << '\n';
-  std::cout << "state:" << state << '\n';
-
-  // while (std::getline(infile, line)) {
-  //   //std::cout << line << '\n' << '\n';
-  //   string::iterator it;
-  //   it = line.begin();
-  //   cout << * it << " ";
-  //   it++;
-  //   cout << * it;
-  //   // if (line == 'DATA=\n') {
-  //   //   break;
-  //   // }
-  //
-  // }
-  //infile.close();
-  //return true;
-
   return Rcpp::List::create(Rcpp::Named("keyword") = keyword,
                                     Rcpp::Named("language") = language,
                                     Rcpp::Named("subkeys") = subkeys,
                                     Rcpp::Named("values") = values
   );
-
-
 }
 
 
@@ -530,33 +482,34 @@ Rcpp::List parse_px_meta_string(std::string& line, bool debug=false) {
 
 # devtools::load_all()
 # todo fixa denna
-parse_px_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";",T)
-y <- parse_px_meta_string("CHARSET=\"ANSI\";")
-x <- parse_px_meta_string("CHARSET[en]=\"ANSI\";")
-str(x)
-as_tibble(x)
+px_parse_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";")
+px_parse_meta_string("CELLNOTE[sv](kön, *, *, ålder,)=\"Data not applicable\";")
+px_parse_meta_string("CHARSET=\"ANSI\";")
+px_parse_meta_string("CHARSET[en]=\"ANSI\";")
 
-bind_rows(x,y)
+# detta ska returnera DATA så att parsern vet när den ska stanna i loopen sen
+px_parse_meta_string("DATA=")
 
-parse_px_meta_string("VALUENOTE[sv](\"Norway\")=\"Break in time series\";")
-parse_px_meta_string("VALUENOTE[sv](\"Norway\",\"Oslo\")=\"Break in time series\";", T)
-parse_px_meta_string("ELIMINATION(\"kön\")=YES;")
 
-parse_px_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not applicable\";")
-parse_px_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";")
+px_parse_meta_string("VALUENOTE[sv](\"Norway\")=\"Break in time series\";")
+px_parse_meta_string("VALUENOTE[sv](\"Norway\",\"Oslo\")=\"Break in time series\";", T)
+px_parse_meta_string("ELIMINATION(\"kön\")=YES;")
 
-parse_px_meta_string("STUB=\"age\",\"sex\",\"gender\";", T)
-parse_px_meta_string("SOURCE=\"Statistics Sweden#Statistics Finland\";")
+px_parse_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not applicable\";")
+px_parse_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";")
 
-parse_px_meta_string("VALUES(\"age\")=\"0-19\",\"20-39\",\"40-100\";",T)
-parse_px_meta_string("CODES(\"age\")=\"0-19\",\"20-39\",\"40-100\";")
+px_parse_meta_string("STUB=\"age\",\"sex\",\"gender\";", T)
+px_parse_meta_string("SOURCE=\"Statistics Sweden#Statistics Finland\";")
 
-parse_px_meta_string("KEYS(\"age\")=\"VALUES\"\n\"hej\";")
-parse_px_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not applicable;hej\";")
+px_parse_meta_string("VALUES(\"age\")=\"0-19\",\"20-39\",\"40-100\";",T)
+px_parse_meta_string("CODES(\"age\")=\"0-19\",\"20-39\",\"40-100\";")
+
+px_parse_meta_string("KEYS(\"age\")=\"VALUES\"\n\"hej\";")
+px_parse_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not applicable;hej\";")
 
 # ok
-parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\",\"1969\",\"1970\";")
-parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\"-\"1970\";")
+px_parse_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\",\"1969\",\"1970\";")
+px_parse_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\"-\"1970\";")
 
 */
 
@@ -564,5 +517,5 @@ parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\"-\"1970\";")
 // borde faila men gör inte det
 
 /***R
-parse_px_meta_string("TIMEVAL(\"år\")=TLIST(A1,\"1968\"-\"1970\")-;")
+px_parse_meta_string("TIMEVAL(\"år\")=TLIST(A1,\"1968\"-\"1970\")-;")
 */
