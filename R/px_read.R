@@ -1,7 +1,10 @@
-#' library(tidyverse)
-#'
-#'
-#'
+
+# todo: add encoding detection in c++
+px_extract_meta_from_file <- function(file) {
+  tibble::tibble(dplyr::bind_rows(px_parse_meta_file(file)))
+}
+
+
 px_read <- function(file,
                     encoding="guess"
 ) {
@@ -14,18 +17,23 @@ px_read <- function(file,
     print(paste("Encoding:", encoding))
   }
 
-  y <- readr::read_file(file = file, locale = readr::locale(encoding = encoding))
-  y1 <- stringr::str_split_1(y, "DATA=\\r\\n")
-  meta <- y1[1] # metadata-part
+  meta <- px_extract_meta_from_file(file)
 
-
- # mat <- y1[2] # matrix/data-part
+ #  y <- readr::read_file(file = file, locale = readr::locale(encoding = encoding))
+ #  y1 <- stringr::str_split_1(y, "DATA=\\r\\n")
+ #  meta <- y1[1] # metadata-part
+ #
+ #
+ # # mat <- y1[2] # matrix/data-part
 
   return(meta)
 }
 
+px_extract_meta_from_file("inst/extdata/WORK02.px")
 
-# x <- px_read("inst/extdata/WORK02.px", encoding = "UTF-8")
+x <- px_read("inst/extdata/WORK02.px", encoding = "UTF-8")
+
+View(x)
 #
 # str(x)
 # devtools::load_all()

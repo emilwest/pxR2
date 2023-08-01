@@ -4,9 +4,29 @@
 
 using namespace Rcpp;
 
+// helper
+std::string stringvec_to_string(std::vector<std::string> stringvec) {
+  std::string s;
+  bool quoted=false;
+  if (stringvec.size() > 1) quoted = true;
+
+  for (const auto &piece : stringvec) {
+    if (quoted) {
+      s =  s + "\"" + piece + "\"";
+    } else {
+      s =  s + piece;
+    }
+
+    if (piece != stringvec.back()) {
+      s += ",";
+    }
+
+  }
+  return s;
+}
 
 // helper
-std::string extractLastNChars(std::string const &str, int n) {
+std::string extractLastNChars(std::string const &str, unsigned int n) {
   if (str.size() < n) {
     return str;
   }
@@ -72,14 +92,7 @@ std::vector<std::string> px_extract_meta_strings(const std::string& infilename, 
 Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
   std::vector<std::string> meta_strings;
   meta_strings = px_extract_meta_strings(infilename);
-
   List reslist;
-  // DataFrame df = DataFrame::create(Named("keyword"),
-  //                                  Named("language"),
-  //                                  Named("subkeys"),
-  //                                  Named("values")
-  //                                  );
-  String keyword;
 
   for(unsigned int i = 0; i < meta_strings.size(); i++) {
     if (debug) {
@@ -89,18 +102,15 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
 
     try {
       List x = px_parse_meta_string(s);
-      reslist.push_back(x);
-      // df.push_back(x["keyword"], "keyword");
-      // df.push_back(x["language"], "language");
-      // df.push_back(x["subkeys"], "subkeys");
-      // df.push_back(x["values"], "values");
-      // x["keyword"];
-      // x["language"];
-      // x["subkeys"];
-      // x["values"];
+      DataFrame df = DataFrame::create(Named("keyword")=x["keyword"],
+                                       Named("language")=x["language"],
+                                       Named("subkeys")=stringvec_to_string(x["subkeys"]),
+                                       Named("values")=stringvec_to_string(x["values"])
+                                       );
+      reslist.push_back(df);
     }
     catch (const std::runtime_error &ex) {
-      std::cout << " (an error occured at line): " << i;
+      std::cerr << " (an error occured at line): " << i;
       throw ex;
     }
   }
@@ -114,23 +124,26 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
 /*** R
 px_extract_meta_strings("inst/extdata/WORK02.px")
 x <- px_parse_meta_file("inst/extdata/WORK02.px")
-x[[1]] |> tibble::as_tibble()
-x[[1]] |> as.data.frame()
-library(tidyverse)
-x[[1]]
-enframe(x[[1]])
-map(x, ~ enframe(.x) |> group_by(name) |> mutate(value=str_c(value, collapse = ",")))
-stack(x[[1]])
+# x
+# tibble::tibble(dplyr::bind_rows(x)) |> View()
 
-y <- x |>
-  map_if(~length(.x)>1, str_c)
-
-y[[1]]
-x[[1]]
-str(x)
-str(y)
-
-purrr::map(x, unlist) |>
-
-dplyr::bind_rows(x)
+# x[[1]] |> tibble::as_tibble()
+# x[[1]] |> as.data.frame()
+# library(tidyverse)
+# x[[1]]
+# enframe(x[[1]])
+# map(x, ~ enframe(.x) |> group_by(name) |> mutate(value=str_c(value, collapse = ",")))
+# stack(x[[1]])
+#
+# y <- x |>
+#   map_if(~length(.x)>1, str_c)
+#
+# y[[1]]
+# x[[1]]
+# str(x)
+# str(y)
+#
+# purrr::map(x, unlist)
+#
+# dplyr::bind_rows(x)
 */

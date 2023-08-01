@@ -10,21 +10,47 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// parse_px_meta_string
-Rcpp::List parse_px_meta_string(std::string& line, bool debug);
-RcppExport SEXP _pxR2_parse_px_meta_string(SEXP lineSEXP, SEXP debugSEXP) {
+// px_extract_meta_strings
+std::vector<std::string> px_extract_meta_strings(const std::string& infilename, bool debug);
+RcppExport SEXP _pxR2_px_extract_meta_strings(SEXP infilenameSEXP, SEXP debugSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type infilename(infilenameSEXP);
+    Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
+    rcpp_result_gen = Rcpp::wrap(px_extract_meta_strings(infilename, debug));
+    return rcpp_result_gen;
+END_RCPP
+}
+// px_parse_meta_file
+Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug);
+RcppExport SEXP _pxR2_px_parse_meta_file(SEXP infilenameSEXP, SEXP debugSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type infilename(infilenameSEXP);
+    Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
+    rcpp_result_gen = Rcpp::wrap(px_parse_meta_file(infilename, debug));
+    return rcpp_result_gen;
+END_RCPP
+}
+// px_parse_meta_string
+Rcpp::List px_parse_meta_string(std::string& line, bool debug);
+RcppExport SEXP _pxR2_px_parse_meta_string(SEXP lineSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string& >::type line(lineSEXP);
     Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
-    rcpp_result_gen = Rcpp::wrap(parse_px_meta_string(line, debug));
+    rcpp_result_gen = Rcpp::wrap(px_parse_meta_string(line, debug));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_pxR2_parse_px_meta_string", (DL_FUNC) &_pxR2_parse_px_meta_string, 2},
+    {"_pxR2_px_extract_meta_strings", (DL_FUNC) &_pxR2_px_extract_meta_strings, 2},
+    {"_pxR2_px_parse_meta_file", (DL_FUNC) &_pxR2_px_parse_meta_file, 2},
+    {"_pxR2_px_parse_meta_string", (DL_FUNC) &_pxR2_px_parse_meta_string, 2},
     {NULL, NULL, 0}
 };
 
