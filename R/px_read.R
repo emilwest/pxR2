@@ -4,7 +4,8 @@ px_extract_meta_from_file <- function(file) {
   tibble::tibble(dplyr::bind_rows(px_parse_meta_file(file)))
 }
 
-
+#?pxR2::px_parse_meta_string()
+# ?px_create()
 px_read <- function(file,
                     encoding="guess"
 ) {
@@ -29,11 +30,10 @@ px_read <- function(file,
   return(meta)
 }
 
-px_extract_meta_from_file("inst/extdata/WORK02.px")
+# px_extract_meta_from_file("inst/extdata/WORK02.px")
+#
+# x <- px_read("inst/extdata/WORK02.px", encoding = "UTF-8")
 
-x <- px_read("inst/extdata/WORK02.px", encoding = "UTF-8")
-
-View(x)
 #
 # str(x)
 # devtools::load_all()

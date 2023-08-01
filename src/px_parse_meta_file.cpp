@@ -52,8 +52,8 @@ std::vector<std::string> px_extract_meta_strings(const std::string& infilename, 
 
     // check if first char is " and remove it
     if (multiline && line.at(0) == '"') {
-      // if lastchar was =, dont remove "
-      if (lastchar != "=") {
+      // if lastchar was " on previous line, remove " on next line
+      if (lastchar == "\"") {
         line.erase(0,1);
       }
     }
@@ -122,7 +122,7 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
 
 
 /*** R
-px_extract_meta_strings("inst/extdata/WORK02.px")
+# px_parse_meta_file("inst/extdata/TEMP02.px")
 x <- px_parse_meta_file("inst/extdata/WORK02.px")
 # x
 # tibble::tibble(dplyr::bind_rows(x)) |> View()
