@@ -20,7 +20,6 @@ std::string stringvec_to_string(std::vector<std::string> stringvec) {
     if (piece != stringvec.back()) {
       s += ",";
     }
-
   }
   return s;
 }
@@ -32,6 +31,63 @@ std::string extractLastNChars(std::string const &str, unsigned int n) {
   }
   return str.substr(str.size() - n);
 }
+
+//' Gets encoding from px file in CODEPAGE keyword.
+//'
+//' If CODEPAGE is not found within the first 100 lines
+//' or until DATA keyword is found,
+//' the encoding will be guessed with charset detection.
+//'
+//' @param path File path to px file
+//'
+// [[Rcpp::export]]
+static std::string get_encoding(const std::string& path) {
+
+  std::string myencoding;
+
+  if (path.substr(path.size() - 3) == ".px") {
+    std::ifstream tr(path);
+    std::string line;
+    int lineCount = 1;
+
+    while (lineCount <= 100 && std::getline(tr, line) && line.find("DATA=") != 0) {
+      if (line.find("CODEPAGE=") == 0) {
+        myencoding = line.substr(line.find("\"") + 1);
+        myencoding = myencoding.substr(0, myencoding.rfind("\""));
+      }
+      lineCount++;
+    }
+  }
+
+  // std::string cs;
+  // const int BUFFER_SIZE = 1024;
+  // char buffer[BUFFER_SIZE];
+  // int size = 0;
+  // std::ifstream fs(path, std::ifstream::binary);
+  //
+  // if (fs.is_open()) {
+  //   Ude::CharsetDetector det;
+  //   size = std::min(BUFFER_SIZE, static_cast<int>(fs.tellg()));
+  //   fs.read(buffer, size);
+  //   det.Feed(buffer, size);
+  //   det.DataEnd();
+  //   cs = det.Charset;
+  // }
+  //
+  // if (cs.empty()) {
+  //   return "default"; // Replace with actual default encoding
+  // }
+  //
+  // // Fix it if it is ASCII; it is probably the codepage of the machine
+  // if (cs.compare("ASCII") == 0) {
+  //   return "default"; // Replace with actual default encoding
+  // }
+  //
+
+  return myencoding;
+}
+
+
 
 // [[Rcpp::export]]
 std::vector<std::string> px_extract_meta_strings(const std::string& infilename, bool debug=false) {
@@ -124,8 +180,10 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
 /*** R
 # px_parse_meta_file("inst/extdata/TEMP02.px")
 x <- px_parse_meta_file("inst/extdata/WORK02.px")
+# get_encoding("inst/extdata/WORK02.px")
+# get_encoding("inst/extdata/TEMP02.px")
 # x
-# tibble::tibble(dplyr::bind_rows(x)) |> View()
+# y <- tibble::tibble(dplyr::bind_rows(x))
 
 # x[[1]] |> tibble::as_tibble()
 # x[[1]] |> as.data.frame()
