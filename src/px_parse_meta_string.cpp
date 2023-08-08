@@ -34,10 +34,8 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
   bool InFnutt = false;
   //bool _keepRunning = true;
 
-  std::string keyword;
-  std::string language;
-  std::vector<std::string> values;
-  std::vector<std::string> subkeys;
+  std::string keyword, language;
+  std::vector<std::string> values, subkeys;
 
   enum ParserState {
     ReadKeyword = 0,
@@ -268,7 +266,6 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
         }
 
         if (c == END_VALUES) {
-
           // convert values vector to string
           std::string s;
           for (const auto &piece : values) s += piece;
@@ -283,28 +280,12 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
             std::string("'.\nAdditional error message: \n") +
             errorhelp
             ;
-
           values.clear();
-          // values.push_back(keyword);
-          // values.push_back(language);
-          // values.push_back(subkey);
-
           stop(error_message);
-
-          // keyword.clear();
-          // language.clear();
-          // subkey.clear();
-          // hasLanguage = false;
-          // hasSubkeys = false;
-          // sb.clear();
-          // state = ParserState::ReadKeyword;
-          // InFnutt = false;
         }
       }
       else {
         if (InFnutt) {
-          //std::cout << InFnutt;
-
           switch (valueType) {
           // NotSet first by default
           case ValueType::NotSet:
@@ -330,7 +311,6 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
               // lägg in check här? om values.empty() och
               // c == END_VALUES och
               // sb[sb.length() - 1] != FNUTT, ge error om att closing " saknas?
-
 
               sb += c;
             }
@@ -425,13 +405,6 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
           case END_VALUES:
             // save string to values
             values.push_back(sb);
-
-            // restore states (if in while-loop)
-            // keyword.clear();
-            // language.clear();
-            // subkey.clear();
-            // hasLanguage = false;
-            // hasSubkeys = false;
             sb.clear();
             //state = ParserState::ReadKeyword;
             break;
