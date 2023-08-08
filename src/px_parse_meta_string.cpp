@@ -16,7 +16,7 @@
 //' px_parse_meta_string("NOTE=\"Preliminary data\";")
 //' px_parse_meta_string("CODEPAGE=\"UTF-8\";")
 // [[Rcpp::export]]
-Rcpp::List px_parse_meta_string(std::string& line, bool debug=false) {
+Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
 
   const char FNUTT = '\"';
   const char START_LANGUAGE = '[';
@@ -67,7 +67,7 @@ Rcpp::List px_parse_meta_string(std::string& line, bool debug=false) {
   //std::ifstream infile(infilename);
   //std::string line;
 
-  for(char& c : line) {
+  for(char c : line) {
     if (c == FNUTT) {
       InFnutt = !InFnutt;
     }
