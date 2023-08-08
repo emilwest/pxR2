@@ -35,12 +35,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // px_parse_meta_string
-Rcpp::List px_parse_meta_string(std::string& line, bool debug);
+Rcpp::List px_parse_meta_string(const std::string& line, bool debug);
 RcppExport SEXP _pxR2_px_parse_meta_string(SEXP lineSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string& >::type line(lineSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type line(lineSEXP);
     Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
     rcpp_result_gen = Rcpp::wrap(px_parse_meta_string(line, debug));
     return rcpp_result_gen;
