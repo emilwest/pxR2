@@ -69,7 +69,7 @@
 #' @examples
 #' px_obj <- px_create(.data = ex_data,
 #'           stub = "sex,age",
-#'           heading = "time",
+#'           heading = c"time",
 #'           time_variable = "time",
 #'           time_scale="annual",
 #'           matrix = "TEST01",
@@ -136,12 +136,14 @@ px_create <- function(
 
   new_meta <- px_meta_add_keyword(new_meta, "TITLE", value = px_generate_dynamic_title(new_meta))
 
-  # slutliga checks
+  # final checks
   px_meta_validate(new_meta)
 
-  stubvec <-  c(stub) |> str_split(",") |> unlist()
-  headingvec <-  c(heading) |> str_split(",") |> unlist()
-  stubheading <- c(stubvec, headingvec)
+  new_meta <- sort_metadata_keywords(new_meta)
+
+  # stubvec <-  c(stub) |> str_split(",") |> unlist()
+  # headingvec <-  c(heading) |> str_split(",") |> unlist()
+  # stubheading <- c(stubvec, headingvec)
 
   data <- convert_data_to_final(new_meta, .data)
   print(data)
@@ -165,44 +167,5 @@ px_create <- function(
 #           decimals = 1,
 #           language = "en"
 # )
-
-
-
-# TODO
-px_meta_get_stub <- function(.metadata_df) {
-  .metadata_df
-}
-
-data_to_matrix <- function(data, stubvec) {
-  m <- data |>
-    dplyr::select(-all_of(stubvec)) |>
-    as.matrix()
-  colnames(m) <- NULL
-  m
-}
-
-matrix_to_text <- function(m) {
-  apply(format(m), 1, paste, collapse=" ")
-}
-
-# getwd()
-# xx <- px_obj$data |> data_to_matrix(stubvec)
-# matrix_text <- xx |> matrix_to_text()
-#
-#
-# meta_lines <- px_obj$metadata |> px_parse_metadata() |> pull(s)
-# # skapa px filen med en rad per keyword + matrisen längst ner
-# c(meta_lines, "DATA=", matrix_text, ";") |> write_lines("text.px")
-#
-
-
-
-# TODO
-px_write <- function(.px_obj) {
-  meta_lines <- px_obj$metadata |> px_parse_metadata() |> pull(s)
-  c(meta_lines, "DATA=", matrix_text, ";") |> write_lines("text.px")
-}
-
-
 
 

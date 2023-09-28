@@ -23,7 +23,7 @@ use_test("helloe") # skapar testfil för funktionen helloe
 
 library(testthat)
 
-load_all()
+devtools::load_all()
 devtools::document()
 devtools::test()
 devtools::build()
@@ -51,7 +51,5 @@ usethis::use_tidy_dependencies()
 usethis::use_package("dplyr", type = "Imports", min_version = "1.1.2")
 
 ?dplyr
-
-
 
 

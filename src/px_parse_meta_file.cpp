@@ -1,8 +1,22 @@
+// [[Rcpp::depends(BH)]]
+
 #include <Rcpp.h>
 #include <fstream>
 #include "px_parse_meta_string.h"
+#include <locale>
 
 using namespace Rcpp;
+
+
+// [[Rcpp::export]]
+void hej() {
+  if (const char* loc = std::setlocale(LC_ALL, "sv_SE.UTF-8"))
+    std::wprintf(L"New LC_ALL locale: %s\n", loc);
+
+  std::cout << "The default locale is " << std::locale().name() << '\n'
+            << "The user's locale is " << std::locale("").name() << '\n';
+}
+
 
 // helper
 std::string stringvec_to_string(std::vector<std::string> stringvec) {
@@ -89,6 +103,9 @@ std::string extractLastNChars(std::string const &str, unsigned int n) {
 
 
 
+
+
+
 // [[Rcpp::export]]
 std::vector<std::string> px_extract_meta_strings(const std::string& infilename, bool debug=false) {
 
@@ -158,6 +175,7 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
 
     try {
       List x = px_parse_meta_string(s);
+
       DataFrame df = DataFrame::create(Named("keyword")=x["keyword"],
                                        Named("language")=x["language"],
                                        Named("subkeys")=stringvec_to_string(x["subkeys"]),
@@ -180,6 +198,15 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
 /*** R
 # px_parse_meta_file("inst/extdata/TEMP02.px")
 x <- px_parse_meta_file("inst/extdata/WORK02.px")
+
+
+hej()
+#px_extract_meta_strings("inst/extdata/WORK02.px")
+
+
+x <- px_parse_meta_file("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\CHIL03.px")
+x <- px_parse_meta_file("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\scb.px")
+
 # get_encoding("inst/extdata/WORK02.px")
 # get_encoding("inst/extdata/TEMP02.px")
 # x

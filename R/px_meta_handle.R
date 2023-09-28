@@ -25,13 +25,14 @@ px_meta_init_empty <- function() {
 #' @examples
 #' px_meta_init_unempty("VALUENOTE", "", "age", "15-20 years", "Preliminary figures")
 #' px_meta_init_unempty("valuenote", "", "age", "15-20 years", "Preliminary figures")
-#' # will throw error if keyword is not valid according to PX Specifications:
-#' px_meta_init_unempty("HEJ", "", "age", "15-20 years", "Preliminary figures")
+#' px_meta_init_unempty("STUB", "", "", "", "age,sex")
+#' # will throw error if keyword is not valid according to PX Specifications
 px_meta_init_unempty <- function(keyword,
                                  language,
                                  varname,
                                  valname,
                                  value) {
+  #assertthat::assert_that(is.character(value))
   toadd <- dplyr::tibble(keyword=toupper(keyword),  language=language, varname=varname,  valname=valname,  value=value)
   px_meta_check_if_keywords_are_valid(toadd)
   return(toadd)
@@ -51,7 +52,8 @@ px_meta_init_unempty <- function(keyword,
 #' @export
 #'
 #' @examples
-#' px_meta_add_keyword(meta_example, "VALUENOTE", "", "age", "15-20 years", "Preliminary figures")
+#' px_meta_add_keyword(meta_example, "VALUENOTE", NA, "typ", "typ value", "Preliminary figures")
+#' px_meta_add_keyword(meta_example, "VALUENOTE", NA, NA, NA, c("age","sex"))
 px_meta_add_keyword <- function(
     metadata,
   keyword,
@@ -75,8 +77,6 @@ px_meta_add_keyword <- function(
     #TODO lägg in check här
   }
 
-  assertthat::assert_that(is.character(value))
-
   tryCatch(
     metadata %>%
       dplyr::rows_insert(to_add, by = c("keyword","language", "varname", "valname"))
@@ -88,6 +88,7 @@ px_meta_add_keyword <- function(
   )
 
 }
+
 
 
 

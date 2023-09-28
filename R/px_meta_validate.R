@@ -44,8 +44,7 @@ px_meta_check_if_keywords_are_valid <- function(.metadata_df) {
   }
 
   assertthat::assert_that(nrow(test)== 0,
-                          msg = str_c("There are keywords in the metadata
-                                      that are not in PX-file format specification AXIS-VERSION 2013.
+                          msg = str_c("There are keywords in the metadata that are not in PX-file format specification AXIS-VERSION 2013.
                                       Unknown keywords: ",
                                       unkown_keywords,
                                       ".\nConsider removing it or check the spelling."

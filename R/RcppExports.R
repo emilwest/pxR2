@@ -11,6 +11,10 @@
 #'
 NULL
 
+hej <- function() {
+    invisible(.Call(`_pxR2_hej`))
+}
+
 px_extract_meta_strings <- function(infilename, debug = FALSE) {
     .Call(`_pxR2_px_extract_meta_strings`, infilename, debug)
 }

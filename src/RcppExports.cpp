@@ -10,6 +10,15 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// hej
+void hej();
+RcppExport SEXP _pxR2_hej() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    hej();
+    return R_NilValue;
+END_RCPP
+}
 // px_extract_meta_strings
 std::vector<std::string> px_extract_meta_strings(const std::string& infilename, bool debug);
 RcppExport SEXP _pxR2_px_extract_meta_strings(SEXP infilenameSEXP, SEXP debugSEXP) {
@@ -48,6 +57,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_pxR2_hej", (DL_FUNC) &_pxR2_hej, 0},
     {"_pxR2_px_extract_meta_strings", (DL_FUNC) &_pxR2_px_extract_meta_strings, 2},
     {"_pxR2_px_parse_meta_file", (DL_FUNC) &_pxR2_px_parse_meta_file, 2},
     {"_pxR2_px_parse_meta_string", (DL_FUNC) &_pxR2_px_parse_meta_string, 2},

@@ -1,6 +1,11 @@
 
+// [[Rcpp::depends(BH)]]
+
 #include <Rcpp.h>
 #include <fstream>
+
+
+//std::locale loc = boost::locale::gen("en_US.UTF-8");
 
 //' Parse a single px-formatted string.
 //'
@@ -481,6 +486,7 @@ px_parse_meta_string("VALUENOTE[sv](\"Norway\",\"Oslo\")=\"Break in time series\
 px_parse_meta_string("ELIMINATION(\"kön\")=YES;")
 
 px_parse_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not applicable\";")
+px_parse_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"Åland\")=\"Data not applicable\";")
 px_parse_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data not applicable\";")
 
 px_parse_meta_string("STUB=\"age\",\"sex\",\"gender\";", T)
@@ -495,6 +501,7 @@ px_parse_meta_string("CELLNOTE(\"kön\", \"*\", \"*\", \"ålder\")=\"Data not ap
 # ok
 px_parse_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\",\"1969\",\"1970\";")
 px_parse_meta_string("TIMEVAL(\"år\")=TLIST(A1),\"1968\"-\"1970\";")
+
 
 */
 
