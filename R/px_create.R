@@ -85,6 +85,8 @@
 #'
 px_create <- function(
     .data, #
+    meta_csv = NULL,
+    codes_csv = NULL,
     stub, # variables to display along the rows
     heading, # variables to display along the columns
     time_variable=NULL, # mandatory if time variable exist (TLIST)

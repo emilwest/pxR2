@@ -61,8 +61,8 @@ px_parse_metadata <- function(.metadata_df) {
 
   .metadata_df %>%
     # todo fixa
-    dplyr::mutate(value_parsed = ifelse(value %in% c("TITLE", "CONTENTS"),
-                                        value,
+    dplyr::mutate(value_parsed = ifelse(keyword %in% c("TITLE", "CONTENTS"),
+                                        addquotes(value),
                                         map_chr(value, splitlist))) %>%
     dplyr::mutate(s = ifelse(is.na(varname) & is.na(valname),
                       str_c(keyword, e, value_parsed, E),
