@@ -148,7 +148,7 @@ px_create <- function(
   # stubheading <- c(stubvec, headingvec)
 
   data <- convert_data_to_final(new_meta, .data)
-  print(data)
+  #print(data)
 
   return(list(metadata = new_meta,
               data = data))

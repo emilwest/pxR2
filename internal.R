@@ -23,6 +23,7 @@ use_test("helloe") # skapar testfil för funktionen helloe
 
 library(testthat)
 
+
 devtools::load_all()
 devtools::document()
 devtools::test()
@@ -53,3 +54,68 @@ usethis::use_package("dplyr", type = "Imports", min_version = "1.1.2")
 ?dplyr
 
 
+# ---------------------
+# example
+
+ex_data2 <- ex_data |> mutate(sex = factor(sex, levels = c("Female", "Male", "Total"), labels = c("Female, hej", "Male, hej2", "Total, total3")))
+
+
+px_obj <- px_create(ex_data2,
+                    stub = "sex,age",
+                    heading = "time",
+                    time_variable = "time",
+                    time_scale = "annual",
+                    matrix = "TEST01",
+                    subject_area = "Forestry",
+                    subject_code = "F",
+                    units = "Number",
+                    contents = "Number of trees",
+                    decimals = 1,
+                    language = "en"
+)
+
+px_obj
+px_parse_metadata(px_obj$metadata)
+
+px_write(px_obj, file = "test4.px")
+px_write(px_obj)
+
+
+
+# devtools::install_github('StatisticsGreenland/pxmake',
+#                          ref = '167-metamake-from-dataset'
+# )
+#
+# library(tidyverse)
+# library(pxmake)
+# packageVersion("pxmake")
+#
+# ##
+# set.seed(1)
+# ex_data <- tibble(sex = c("Female", "Male", "Total"),
+#                   age = c("0-15", "16-25", "26-50"),
+#                   time = c("2021", "2022", "2023"),
+#                   value = c(NA, NA, NA)
+# ) %>%
+#   complete(sex, age, time) %>%
+#   mutate(value = rnorm(27, mean = 20, sd = 5))
+#
+# ex_data
+#
+# a <- ex_data |>
+#   dplyr::rename(year=time)
+#
+# metamake(a, out_path = "HEJ.xlsx")
+#a <- pxmake::metamake(ex_data)
+#a
+#
+# # this works
+# df <-
+#   world_bank_pop %>%
+#   filter(indicator == "SP.POP.TOTL") %>%
+#   filter(country %in% c("DNK", "SWE", "GRL")) %>%
+#   select(-indicator) %>%
+#   pivot_longer(cols = -country, names_to = "year")
+#
+# df
+# metamake(df, out_path = 'population.xlsx')

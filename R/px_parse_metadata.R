@@ -33,10 +33,11 @@ addquotes <- function(txt) {
 #' splitlist('2021,2022,2023')
 #'
 splitlist <- function(txt) {
-  str_split_1(txt, ",") %>%
-    addquotes() %>%
+  str_split_1(txt, ",") |>
+    addquotes() |>
     str_c(collapse=",")
 }
+
 
 
 #' Parse px metadata tibble to px-formatted text.
@@ -59,11 +60,12 @@ px_parse_metadata <- function(.metadata_df) {
   oq <- "("
   eq <- ")"
 
-  .metadata_df %>%
-    # todo fixa
-    dplyr::mutate(value_parsed = ifelse(keyword %in% c("TITLE", "CONTENTS"),
-                                        addquotes(value),
-                                        map_chr(value, splitlist))) %>%
+  .metadata_df |>
+    left_join(specs |> select(Keyword, Multivalue, Quoted), by = c("keyword" = "Keyword")) |>
+    dplyr::mutate(value_parsed_tmp = ifelse(Multivalue == TRUE & keyword != "VALUES", map_chr(value, splitlist), value),
+                  value_parsed = ifelse(Multivalue == FALSE & keyword != "VALUES" & Quoted == TRUE, addquotes(value_parsed_tmp), value_parsed_tmp)
+    ) |>
+    select(-Multivalue, -Quoted, -value_parsed_tmp) |>
     dplyr::mutate(s = ifelse(is.na(varname) & is.na(valname),
                       str_c(keyword, e, value_parsed, E),
                       NA

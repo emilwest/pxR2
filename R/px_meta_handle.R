@@ -107,7 +107,9 @@ px_meta_add_keyword <- function(
 #' @export
 #'
 #' @examples
-#'
+#' meta_example |>
+#' filter(keyword != "TIMEVAL") |>
+#' px_meta_add_timeval("år", "annual")
 px_meta_add_timeval <- function(.metadata_df,
                         time_variable,
                         time_scale # A1/annual, H1/halfyear, Q1/quarterly, M1 monthly, W1/weekly

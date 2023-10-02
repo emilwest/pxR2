@@ -26,5 +26,6 @@ Initialize nonempty px metadata tibble with arguments
 \examples{
 px_meta_init_unempty("VALUENOTE", "", "age", "15-20 years", "Preliminary figures")
 px_meta_init_unempty("valuenote", "", "age", "15-20 years", "Preliminary figures")
+px_meta_init_unempty("STUB", "", "", "", "age,sex")
 # will throw error if keyword is not valid according to PX Specifications
 }

@@ -1,6 +1,6 @@
 
 test_that("error throws if any mandatory variables are missing", {
-  testthat::expect_error(px_meta_check_mandatory(meta_example))
+  testthat::expect_error(px_meta_check_mandatory(meta_example |> filter(keyword != "UNITS")))
 })
 
 test_that("language dependent keywords are valid", {

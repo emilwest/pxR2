@@ -1,26 +1,28 @@
-# todo
+
 
 px_meta_check_mandatory <- function(.metadata_df) {
   mandatory_vars <- specs %>%
-    dplyr::filter(Mandatory=="Yes") %>%
-    dplyr::filter(Keyword!="DATA") %>%
+    dplyr::filter(Mandatory == TRUE) %>%
+    dplyr::filter(Keyword != "DATA") %>%
     dplyr::select(Keyword)
 
   missing <- mandatory_vars %>%
     dplyr::anti_join(.metadata_df, by = c("Keyword" = "keyword"))
   missing_in_text <- str_c(pull(missing), collapse = ", ")
+  missing_in_text_help <- str_c("show_keyword_help(\"",pull(missing), "\")", collapse = ", ")
 
   assertthat::assert_that(nrow(missing)== 0,
                           msg = str_c("The following mandatory keywords are missing in metadata: ",
                                       missing_in_text,
-                                      ". Please add them to the metadata."))
+                                      ". Please add them to the metadata. \n Type ", missing_in_text_help, " to get help.")
+                          )
 
 }
 
 
 px_meta_check_if_language_dependent_ok <- function(.metadata_df) {
   lang_dep <- specs %>%
-    dplyr::filter(Language_dependent=="Yes") %>%
+    dplyr::filter(Language_dependent == TRUE) %>%
     dplyr::select(Keyword)
 
   should_not_have_language <- .metadata_df %>%

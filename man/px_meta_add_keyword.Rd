@@ -34,4 +34,5 @@ Add new row of keywords to metadata tibble
 }
 \examples{
 px_meta_add_keyword(meta_example, "VALUENOTE", NA, "typ", "typ value", "Preliminary figures")
+px_meta_add_keyword(meta_example, "VALUENOTE", NA, NA, NA, c("age","sex"))
 }

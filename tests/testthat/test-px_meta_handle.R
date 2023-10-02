@@ -22,9 +22,9 @@ test_that("keyword rows can be inserted into metadata", {
   )
 })
 
-test_that("keyword rows with onlt keyword+value can be inserted into metadata", {
+test_that("keyword rows with only keyword+value can be inserted into metadata", {
   expect_no_error(
-    px_meta_add_keyword(x,
+    px_meta_add_keyword(meta_example,
                         keyword = "MATRIX",
                         value = "s")
 
@@ -33,7 +33,7 @@ test_that("keyword rows with onlt keyword+value can be inserted into metadata", 
 
 test_that("error is thrown if keyword is invalid", {
   expect_error(
-    px_meta_add_keyword(x,
+    px_meta_add_keyword(meta_example,
                         keyword = "x",
                         value = "s")
 

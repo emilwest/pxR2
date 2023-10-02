@@ -7,6 +7,8 @@ Creates all necessary metadata and generates VALUE keywords dynamically based on
 \usage{
 px_create(
   .data,
+  meta_csv = NULL,
+  codes_csv = NULL,
   stub,
   heading,
   time_variable = NULL,
@@ -96,7 +98,7 @@ Creates all necessary metadata and generates VALUE keywords dynamically based on
 \examples{
 px_obj <- px_create(.data = ex_data,
           stub = "sex,age",
-          heading = "time",
+          heading = c"time",
           time_variable = "time",
           time_scale="annual",
           matrix = "TEST01",

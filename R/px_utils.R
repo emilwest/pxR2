@@ -1,4 +1,18 @@
 
+
+
+#' Extract values from dataframe/tibble into metadata tibble.
+#'
+#'
+#' @param .data The dataframe or tibble to extract unique variable values from.
+#' @param as_list If TRUE, all unique variable values are returned as a list.
+#'
+#' @return Returns metadata tibble or list with extracted unique variable values
+#' @export
+#'
+#' @examples
+#' px_get_values_from_data(ex_data)
+#' px_get_values_from_data(ex_data, as_list = T)
 px_get_values_from_data <- function(.data, as_list = FALSE) {
   assertthat::assert_that(any(names(.data) %in% "value"),
                           msg = "No column named value found in data frame, please add it.")
@@ -14,12 +28,14 @@ px_get_values_from_data <- function(.data, as_list = FALSE) {
     return(levs)
   } else {
     levs %>%
+      map(addquotes) |>
       map(str_c, collapse = ",") %>%
       dplyr::as_tibble() %>%
       tidyr::pivot_longer(everything(), names_to = "varname", values_to = "value") %>%
       dplyr::mutate(keyword = "VALUES", language = NA_character_, valname = NA_character_)
   }
 }
+
 
 
 px_add_values_from_data <- function(.metadata_df, .data) {
@@ -30,7 +46,7 @@ px_add_values_from_data <- function(.metadata_df, .data) {
     rows_insert(vals_to_add, by = c("keyword","language", "varname", "valname"))
 }
 
-#px_add_values_from_data(new_meta, ex_data)
+# px_add_values_from_data(new_meta, ex_data)
 
 
 
@@ -98,7 +114,7 @@ split_commas <- function(.values) {
 
 
 
-#' Generate dynamic title based on LANGUAGE, STUB and HEADING
+#' Generate dynamic TITLE based on LANGUAGE, STUB and HEADING
 #'
 #' @param .metadata_df metadata tibble to extract from
 #'
@@ -106,6 +122,7 @@ split_commas <- function(.values) {
 #' @export
 #'
 #' @examples
+#' px_generate_dynamic_title(meta_example)
 px_generate_dynamic_title <- function(.metadata_df) {
   default_lang <- get_value_by_keyword(.metadata_df, "LANGUAGE")
   contents <- get_value_by_keyword(.metadata_df, "CONTENTS")

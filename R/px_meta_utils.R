@@ -19,3 +19,28 @@ sort_metadata_keywords <- function(.metadata_df) {
     arrange(keyword)
 }
 
+
+
+
+
+show_keyword_help <- function(keyword) {
+  specs |>
+    filter(Keyword == keyword) |>
+    str_glue_data(
+      "Keyword: {Keyword} ({ifelse(Mandatory, 'Mandatory', 'Not mandatory')}, {ifelse(Language_dependent, 'Language dependent', 'Not language dependent')})",
+      "\nType: {Type}",
+      "\nMultiline: {Multiline}",
+      "\nMax length: {Length}",
+      "\nDefault value: {Default_value}",
+      "\n-----------------------------",
+      "\nKeyword description:",
+      "\n\n{Note}"
+    )
+}
+
+# show_keyword_help("CODEPAGE")
+
+
+
+
+
