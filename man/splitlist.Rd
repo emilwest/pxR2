@@ -2,7 +2,7 @@
 % Please edit documentation in R/px_parse_metadata.R
 \name{splitlist}
 \alias{splitlist}
-\title{Helper for metadata parser, splits a string to vector, adds quates and joins back with commas.}
+\title{Helper for metadata parser, splits a string to vector, adds quotes and joins back with commas.}
 \usage{
 splitlist(txt)
 }
@@ -13,7 +13,7 @@ splitlist(txt)
 Returns texts vector with added quotes around values, e.g '"\"2021\",\"2022\",\"2023\""'
 }
 \description{
-Helper for metadata parser, splits a string to vector, adds quates and joins back with commas.
+Helper for metadata parser, splits a string to vector, adds quotes and joins back with commas.
 }
 \examples{
 splitlist('2021,2022,2023')

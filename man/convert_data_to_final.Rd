@@ -2,7 +2,8 @@
 % Please edit documentation in R/px_utils.R
 \name{convert_data_to_final}
 \alias{convert_data_to_final}
-\title{Convert data in long format into same format according to STUB and HEADING}
+\title{Convert data in long format into same format according to STUB and HEADING.
+The dataframe column names are assumed to come from the main language defined in the LANGUAGE keyword.}
 \usage{
 convert_data_to_final(.metadata_df, .data)
 }
@@ -15,5 +16,6 @@ convert_data_to_final(.metadata_df, .data)
 Returns tibble in wide format according to order of STUB and HEADING
 }
 \description{
-Convert data in long format into same format according to STUB and HEADING
+Convert data in long format into same format according to STUB and HEADING.
+The dataframe column names are assumed to come from the main language defined in the LANGUAGE keyword.
 }

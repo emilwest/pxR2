@@ -1,0 +1,51 @@
+CHARSET="ANSI";
+AXIS-VERSION="2013";
+CODEPAGE="UTF-8";
+LANGUAGE="en";
+LANGUAGES="en","sv";
+DECIMALS=2;
+SHOWDECIMALS=1;
+MATRIX="EXAMPLE02";
+SUBJECT-CODE="WATER";
+SUBJECT-AREA="Water and environment";
+SUBJECT-AREA[sv]="Vatten och miljö";
+TITLE[sv]="Antal vattenflaskor per capita efter kön, ålder och år.";
+TITLE="Number of water bottles per capita by sex, age and time.";
+CONTENTS="Number of water bottles per capita";
+CONTENTS[sv]="Antal vattenflaskor per capita";
+UNITS="Number";
+UNITS[sv]="Antal";
+STUB[sv]="kön","ålder";
+STUB="sex","age";
+HEADING[sv]="år";
+HEADING="time";
+VALUES("sex")="Female","Male","Total";
+VALUES[sv]("kön")="Kvinnor","Män","Totalt";
+VALUES("age")="0-15","16-25","26-50";
+VALUES[sv]("ålder")="0-15","16-25","26-50";
+VALUES("time")="2021","2022","2023";
+VALUES[sv]("år")="2021","2022","2023";
+TIMEVAL("time")=TLIST(A1),"2021","2022","2023";
+ELIMINATION("sex")="Total";
+ELIMINATION[sv]("kön")="Totalt";
+CONTACT="Name Surname, xx xxx xxx, mail@email.com";
+CONTACT[sv]="Namn Efternamn, xx xxx xxx, mail@email.com";
+SOURCE[sv]="PX-avdelningen";
+SOURCE="Department of PX";
+NOTE="This is an example footnote in English. New lines are shown in PxWeb by using hashtagts. # This is a new line.";
+NOTE[sv]="Detta är en exempelfotnot på svenska. Nya rader visas i PxWeb med hjälp av hashtags. # Detta är en ny rad.";
+NOTE("age")="This is a footnote for the variable age.";
+NOTE[sv]("ålder")="Detta är en fotnot för variabeln ålder.";
+VALUENOTE("age","0-15")="This is a specific footnote for the variable age with the variable value 0-15 years.";
+VALUENOTE[sv]("ålder","0-15")="Detta är en specifik fotnot för variabeln ålder med variabelvärdet 0-15 år.";
+DATA=
+16.87 20.92 15.82
+27.98 21.65 15.90
+22.44 23.69 22.88
+18.47 27.56 21.95
+16.89  8.93 25.62
+19.78 19.92 24.72
+24.11 22.97 24.59
+23.91 20.37 10.05
+23.10 19.72 19.22
+;

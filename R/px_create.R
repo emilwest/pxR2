@@ -1,28 +1,40 @@
 # Creates new px-object from dataframe with basic metadata
 
-
 # TODO:
 # P1
 # - create metadata parser:
 #   - DONE add valid keywords
-#    - check if supplied keywords+arguments are valid by creating a dataframe control?
-#    - modify keywords
+#    - DONE check if supplied keywords+arguments are valid by creating a dataframe control?
+#    - DONE modify keywords
 
 # skapa separat df för cellnotes och andra som refererar till variabler
 # CELLNOTE: The values are given in the variable order indicated by STUB and HEADING, startingwith STUB
 # DATANOTECELL
 
-# - create function for creating matrix from stub+heading
+# - DONE create function for creating matrix from stub+heading
 # P2
-# - create export function to convert metadata+data as text
+# - DONE create export function to convert metadata+data as text
 # - create function for extracting metadata from px-object inside r and ourside r
 
 # P3:
-# - sort keywords according to pcaxis 2013
+# - DONE sort keywords according to pcaxis 2013
 # - add various examples for creating new px files
 
 
-# creates new px object
+px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
+  assertthat::assert_that(substring(path, nchar(path)-2)=="csv", msg = "The path must be a csv with ; as separator")
+  csv <- readr::read_delim(path,
+                    delim = delim,
+                    col_types = readr::cols(.default = "c"),
+                    locale = readr::locale(encoding = encoding, ...)
+  )
+  col_order <- c("keyword", "language", "varname", "valname", "value")
+  assertthat::assert_that(all(names(csv) %in% col_order), msg = "The metadata csv must contain the columns: keyword, language, varname, valname and value")
+  dplyr::select(csv, dplyr::all_of(col_order))
+}
+
+px_read_meta_csv("inst/extdata/metadata_example_multilingual.csv")
+
 
 #' Creates new px object from a tibble/data frame.
 #' Creates all necessary metadata and generates VALUE keywords dynamically based on the variable levels in the data frame.
@@ -62,6 +74,7 @@
 #' @param source States the organization which is responsible for the statistics or the sources used. Is shown with the footnote.
 #' If multiple sources are used, use # between each source. For example 'Statistics Sweden#Statistics Finland'.
 #' @param note General footnote for the table.
+#' @param show_data One of "wide" or "long" (original)
 #'
 #' @return Returns a list with two entries, one containing the metadata information and one for the data.
 #' @export
@@ -85,8 +98,8 @@
 #'
 px_create <- function(
     .data, #
-    meta_csv = NULL,
-    codes_csv = NULL,
+    meta_csv_path = NULL,
+    codes_csv_path = NULL,
     stub, # variables to display along the rows
     heading, # variables to display along the columns
     time_variable=NULL, # mandatory if time variable exist (TLIST)
@@ -106,53 +119,70 @@ px_create <- function(
     last_updated = format(Sys.time(), "%Y%m%d %H:%M"),
     contact = NULL,
     source = NULL,
-    note = NULL) {
+    note = NULL,
+    show_data = "wide",
+    ...
+    ) {
 
-  new_meta <- px_meta_init_empty()
-  new_meta <- px_meta_add_keyword(new_meta, "STUB", value = stub)
-  new_meta <- px_meta_add_keyword(new_meta, "HEADING", value = heading)
-  new_meta <- px_meta_add_timeval(new_meta, time_variable = time_variable, time_scale = time_scale)
-  new_meta <- px_meta_add_keyword(new_meta, "MATRIX", value = matrix)
-  new_meta <- px_meta_add_keyword(new_meta, "SUBJECT-AREA", value = subject_area)
-  new_meta <- px_meta_add_keyword(new_meta, "SUBJECT-CODE", value = subject_code)
-  new_meta <- px_meta_add_keyword(new_meta, "UNITS", value = units)
-  new_meta <- px_meta_add_keyword(new_meta, "CONTENTS", value = contents)
-  new_meta <- px_meta_add_keyword(new_meta, "DECIMALS", value = as.character(decimals))
-  new_meta <- px_meta_add_keyword(new_meta, "SHOWDECIMALS", value = as.character(showdecimals))
-  new_meta <- px_meta_add_keyword(new_meta, "LANGUAGE", value = language)
-  new_meta <- px_meta_add_keyword(new_meta, "CHARSET", value = charset)
-  new_meta <- px_meta_add_keyword(new_meta, "AXIS-VERSION", value = axis_version)
-  new_meta <- px_meta_add_keyword(new_meta, "CODEPAGE", value = codepage)
-  new_meta <- px_meta_add_keyword(new_meta, "CREATION-DATE", value = creation_date)
-  new_meta <- px_meta_add_keyword(new_meta, "LAST-UPDATED", value = last_updated)
+  if (!is.null(meta_csv_path)) {
 
-  if (!is.null(contact)) new_meta <- px_meta_add_keyword(new_meta, "CONTACT", value = contact)
-  if (!is.null(source)) new_meta <- px_meta_add_keyword(new_meta, "SOURCE", value = source)
-  if (!is.null(note)) new_meta <- px_meta_add_keyword(new_meta, "NOTE", value = note)
+    new_meta <- px_read_meta_csv(meta_csv_path, ...)
+    # print("in")
 
+  } else {
+    new_meta <- px_meta_init_empty()
+    new_meta <- px_meta_add_keyword(new_meta, "STUB", value = stub)
+    new_meta <- px_meta_add_keyword(new_meta, "HEADING", value = heading)
+    new_meta <- px_meta_add_timeval(new_meta, time_variable = time_variable, time_scale = time_scale)
+    new_meta <- px_meta_add_keyword(new_meta, "MATRIX", value = matrix)
+    new_meta <- px_meta_add_keyword(new_meta, "SUBJECT-AREA", value = subject_area)
+    new_meta <- px_meta_add_keyword(new_meta, "SUBJECT-CODE", value = subject_code)
+    new_meta <- px_meta_add_keyword(new_meta, "UNITS", value = units)
+    new_meta <- px_meta_add_keyword(new_meta, "CONTENTS", value = contents)
+    new_meta <- px_meta_add_keyword(new_meta, "DECIMALS", value = as.character(decimals))
+    new_meta <- px_meta_add_keyword(new_meta, "SHOWDECIMALS", value = as.character(showdecimals))
+    new_meta <- px_meta_add_keyword(new_meta, "LANGUAGE", value = language)
+    new_meta <- px_meta_add_keyword(new_meta, "CHARSET", value = charset)
+    new_meta <- px_meta_add_keyword(new_meta, "AXIS-VERSION", value = axis_version)
+    new_meta <- px_meta_add_keyword(new_meta, "CODEPAGE", value = codepage)
+    new_meta <- px_meta_add_keyword(new_meta, "CREATION-DATE", value = creation_date)
+    new_meta <- px_meta_add_keyword(new_meta, "LAST-UPDATED", value = last_updated)
+
+    if (!is.null(contact)) new_meta <- px_meta_add_keyword(new_meta, "CONTACT", value = contact)
+    if (!is.null(source)) new_meta <- px_meta_add_keyword(new_meta, "SOURCE", value = source)
+    if (!is.null(note)) new_meta <- px_meta_add_keyword(new_meta, "NOTE", value = note)
+  }
+  #print("out")
+
+  # <Dynamically generated>
   # Add VALUES keywords to metadata from .data
   new_meta <- px_add_values_from_data(new_meta, .data)
+  #print("out2")
 
   # add timval values from .data
   new_meta <- add_timevals_from_data_to_value(new_meta, .data, "time")
+  #print("ou3")
 
-  new_meta <- px_meta_add_keyword(new_meta, "TITLE", value = px_generate_dynamic_title(new_meta))
-
+  # add dynamic title (multilingual)
+  dynamic_title <- tibble::as_tibble(px_generate_dynamic_title(new_meta))
+  new_meta <- bind_rows(new_meta, dynamic_title)
+  # </Dynamically generated>
+  #print("ou4")
   # final checks
   px_meta_validate(new_meta)
-
+  #print("ou5")
   new_meta <- sort_metadata_keywords(new_meta)
-
-  # stubvec <-  c(stub) |> str_split(",") |> unlist()
-  # headingvec <-  c(heading) |> str_split(",") |> unlist()
-  # stubheading <- c(stubvec, headingvec)
-
-  data <- convert_data_to_final(new_meta, .data)
-  #print(data)
+  #print("ou55")
+  if (show_data == "wide") {
+    data <- convert_data_to_final(new_meta, .data)
+    #print("ou6")
+  }
 
   return(list(metadata = new_meta,
               data = data))
 }
+
+
 
 
 #
@@ -169,5 +199,8 @@ px_create <- function(
 #           decimals = 1,
 #           language = "en"
 # )
+
+
+
 
 

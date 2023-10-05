@@ -1,14 +1,13 @@
 CHARSET="ANSI";
 AXIS-VERSION="2013";
 CODEPAGE="iso-8859-15";
-LANGUAGES="en","sv";
 CREATION-DATE="20230928 21:17";
 DECIMALS="1";
 SHOWDECIMALS="1";
 MATRIX="TEST01";
 SUBJECT-CODE="F";
 SUBJECT-AREA="Forestry";
-TITLE="Number of trees by sex"," age and time.";
+TITLE="Number of trees by sex age and time.";
 CONTENTS="Number of trees";
 UNITS="Number";
 STUB="sex","age";

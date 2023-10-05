@@ -17,4 +17,5 @@ Generate dynamic TITLE based on LANGUAGE, STUB and HEADING
 }
 \examples{
 px_generate_dynamic_title(meta_example)
+px_generate_dynamic_title(metadata_example_multilingual)
 }

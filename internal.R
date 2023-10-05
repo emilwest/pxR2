@@ -23,6 +23,7 @@ use_test("helloe") # skapar testfil för funktionen helloe
 
 library(testthat)
 
+usethis::use_data_raw("metadata_example_multilingual")
 
 devtools::load_all()
 devtools::document()
@@ -81,6 +82,45 @@ px_write(px_obj, file = "test4.px")
 px_write(px_obj)
 
 
+
+
+px_obj <- px_create(ex_data,
+                    stub = "sex,age",
+                    heading = "time",
+                    time_variable = "time",
+                    time_scale = "annual",
+                    matrix = "TEST01",
+                    subject_area = "Forestry",
+                    subject_code = "F",
+                    units = "Number",
+                    contents = "Number of trees",
+                    decimals = 1,
+                    language = "en"
+)
+
+px_obj
+px_parse_metadata(px_obj$metadata)
+
+px_write(px_obj, file = "test4.px")
+px_write(px_obj)
+
+
+b <- px_create(ex_data,
+               meta_csv_path = "inst/extdata/metadata_example_multilingual.csv")
+
+px_parse_metadata(b$metadata) |> View()
+
+x <- b$metadata |>
+  get_value_by_keyword("STUB")
+x[1] |> split_commas()
+
+px_obj$metadata |>
+  get_value_by_keyword("STUB") |>
+  split_commas()
+
+px_write(b, file = "test_multilingual.px")
+View(b)
+b$metadata |> View()
 
 # devtools::install_github('StatisticsGreenland/pxmake',
 #                          ref = '167-metamake-from-dataset'

@@ -12,11 +12,12 @@ get_value_by_keyword(.metadata_df, .key)
 \item{.key}{keyword you want to get value from}
 }
 \value{
-returns value(s) matching the keyword
+returns named vector of value(s) matching the keyword. If multilingual, the vector is named by the language.
 }
 \description{
 Get value from metadata tibble by keyword
 }
 \examples{
 get_value_by_keyword(meta_example, "STUB")
+get_value_by_keyword(metadata_example_multilingual, "STUB")
 }

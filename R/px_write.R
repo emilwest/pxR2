@@ -3,7 +3,14 @@
 px_write <- function(.px_object, file) {
   data <- .px_object$data
   meta <- .px_object$metadata
-  stubvec <- meta |> get_value_by_keyword("STUB") |> split_commas()
+  main_lang <- meta |> get_value_by_keyword("LANGUAGE")
+  x <- meta |> get_value_by_keyword("STUB")
+  if (length(x) > 1) {
+    stubvec <- x[main_lang] |> split_commas()
+  } else {
+    stubvec <- x[1]
+  }
+
   decimals <- meta |> get_value_by_keyword("DECIMALS") |> as.numeric()
 
   # extract numbers from df only

@@ -17,4 +17,5 @@ Split commas in for example stub
 }
 \examples{
 get_value_by_keyword(meta_example, "STUB") |> split_commas()
+get_value_by_keyword(metadata_example_multilingual, "STUB") |> map(split_commas)
 }

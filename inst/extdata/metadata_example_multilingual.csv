@@ -1,0 +1,34 @@
+﻿keyword;language;varname;valname;value
+CHARSET;;;;ANSI
+CODEPAGE;;;;UTF-8
+AXIS-VERSION;;;;2013
+LANGUAGE;;;;en
+LANGUAGES;;;;en,sv
+CONTENTS;en;;;Number of water bottles per capita
+CONTENTS;sv;;;Antal vattenflaskor per capita
+STUB;sv;;;kön,ålder
+HEADING;sv;;;år
+MATRIX;;;;EXAMPLE02
+STUB;en;;;sex,age
+HEADING;en;;;time
+TIMEVAL;en;time;A1;
+TIMEVAL;sv;år;A1;
+UNITS;en;;;Number
+UNITS;sv;;;Antal
+SUBJECT-AREA;en;;;Water and environment
+SUBJECT-AREA;sv;;;Vatten och miljö
+SUBJECT-CODE;;;;WATER
+DECIMALS;;;;2
+SHOWDECIMALS;;;;1
+SOURCE;sv;;;PX-avdelningen
+SOURCE;en;;;Department of PX
+CONTACT;en;;;Name Surname, xx xxx xxx, mail@email.com
+CONTACT;sv;;;Namn Efternamn, xx xxx xxx, mail@email.com
+NOTE;en;;;This is an example footnote in English. New lines are shown in PxWeb by using hashtagts. # This is a new line.
+NOTE;sv;;;Detta är en exempelfotnot på svenska. Nya rader visas i PxWeb med hjälp av hashtags. # Detta är en ny rad.
+NOTE;en;age;;This is a footnote for the variable age.
+NOTE;sv;ålder;;Detta är en fotnot för variabeln ålder.
+VALUENOTE;en;age;0-15;This is a specific footnote for the variable age with the variable value 0-15 years.
+VALUENOTE;sv;ålder;0-15;Detta är en specifik fotnot för variabeln ålder med variabelvärdet 0-15 år.
+ELIMINATION;en;sex;;Total
+ELIMINATION;sv;kön;;Total
