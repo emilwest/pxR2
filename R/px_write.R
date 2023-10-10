@@ -17,7 +17,7 @@ px_write <- function(.px_object, file) {
   if (length(x) > 1) {
     stubvec <- x[main_lang] |> split_commas()
   } else {
-    stubvec <- x[1]
+    stubvec <- x[1] |> split_commas()
   }
 
   decimals <- meta |> get_value_by_keyword("DECIMALS") |> as.numeric()
