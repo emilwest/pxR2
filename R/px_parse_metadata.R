@@ -81,6 +81,10 @@ px_parse_metadata <- function(.metadata_df, full_dataframe = FALSE) {
 
   tmp <- .metadata_df |>
     sort_metadata_keywords() |>
+    mutate(language = factor(language, levels = langs)) |>
+    arrange(keyword, language)
+
+  tmp <- tmp |>
     dplyr::left_join(specs |> dplyr::select(Keyword, Multivalue, Multiline, Quoted), by = c("keyword" = "Keyword")) |>
     dplyr::mutate(value_parsed_tmp = ifelse(Multivalue == TRUE & keyword != "VALUES",
                                             splitlist(value), value),
@@ -119,6 +123,7 @@ px_parse_metadata <- function(.metadata_df, full_dataframe = FALSE) {
       )) |>
     # TIMEVAL can only occur once, only for main lang
     filter(!(keyword == "TIMEVAL" & language != main_lang))
+
 
   if (full_dataframe) {
     tmp
@@ -186,73 +191,72 @@ px_parse_metadata <- function(.metadata_df, full_dataframe = FALSE) {
 
 
 
-
-
-Q <- '"'
-E <- ";"
-e <- "="
-comma <- ","
-oq <- "("
-eq <- ")"
-b1 <- "["
-b2 <- "]"
-
-main_lang <- px_get_main_language(metadata_example_multilingual)
-langs <- px_get_languages(metadata_example_multilingual)
-
-tmp <- metadata_example_multilingual |>
-  sort_metadata_keywords() |>
-  dplyr::left_join(specs |> dplyr::select(Keyword, Multivalue, Multiline, Quoted), by = c("keyword" = "Keyword")) |>
-  dplyr::mutate(value_parsed_tmp = ifelse(Multivalue == TRUE & keyword != "VALUES",
-                                          splitlist(value), value),
-                value_parsed = ifelse(Multivalue == FALSE & keyword != "VALUES" & Quoted == TRUE, addquotes(value_parsed_tmp), value_parsed_tmp)
-  ) |>
-  dplyr::select(-value_parsed_tmp) |>
-  # KEYWORD[lang] or KEYWORD. KEYWORD[lang] only necessary if its not the main language
-  dplyr::mutate(keyword_parsed = ifelse(!is.na(language) & language != main_lang,
-                                        stringr::str_c(keyword, b1, language, b2),
-                                        keyword)) |>
-  # CHARSET="ANSI";
-  dplyr::mutate(s = ifelse(is.na(varname) & is.na(valname),
-                           stringr::str_c(keyword_parsed, e, value_parsed, E),
-                           keyword_parsed
-  )) |>
-  dplyr::mutate(
-    # NOTE("age")="...";
-    s = ifelse(!is.na(varname) & is.na(valname),
-               stringr::str_c(keyword_parsed, oq, Q, varname, Q, eq, e, value_parsed, E),
-               s
-
-    )) |>
-  dplyr::mutate(
-    # VALUENOTE("age", "0-15")="...";
-    s = ifelse(!is.na(varname) & !is.na(valname),
-               stringr::str_c(keyword_parsed, oq, Q, varname, Q, comma, Q, valname, Q, eq, e, value_parsed, E),
-               s
-    )
-  ) |>
-  dplyr::mutate(
-    # TIMEVAL(”time”)=TLIST(A1), ”1994”, ”1995”,"1996”
-    s = ifelse(keyword == "TIMEVAL" & language == main_lang,
-               stringr::str_c(keyword_parsed, oq, Q, varname, Q, eq, "=TLIST(", valname, "), ", value_parsed, E),
-               s
-
-    )) |>
-  # TIMEVAL can only occur once, only for main lang
-  filter(!(keyword == "TIMEVAL" & language != main_lang))
-
-# TODO!!
-
-tmp |>
-  sort_metadata_keywords() |>
-  mutate(language = factor(language, levels = langs)) |>
-  arrange(keyword, language) |> View()
-
-  arrange(language)
-
-if (full_dataframe) {
-  tmp
-} else {
-  tmp |>
-    dplyr::select(s)
-}
+#
+#
+# Q <- '"'
+# E <- ";"
+# e <- "="
+# comma <- ","
+# oq <- "("
+# eq <- ")"
+# b1 <- "["
+# b2 <- "]"
+#
+# main_lang <- px_get_main_language(metadata_example_multilingual)
+# langs <- px_get_languages(metadata_example_multilingual)
+#
+# tmp <- metadata_example_multilingual |>
+#   sort_metadata_keywords() |>
+#   dplyr::left_join(specs |> dplyr::select(Keyword, Multivalue, Multiline, Quoted), by = c("keyword" = "Keyword")) |>
+#   dplyr::mutate(value_parsed_tmp = ifelse(Multivalue == TRUE & keyword != "VALUES",
+#                                           splitlist(value), value),
+#                 value_parsed = ifelse(Multivalue == FALSE & keyword != "VALUES" & Quoted == TRUE, addquotes(value_parsed_tmp), value_parsed_tmp)
+#   ) |>
+#   dplyr::select(-value_parsed_tmp) |>
+#   # KEYWORD[lang] or KEYWORD. KEYWORD[lang] only necessary if its not the main language
+#   dplyr::mutate(keyword_parsed = ifelse(!is.na(language) & language != main_lang,
+#                                         stringr::str_c(keyword, b1, language, b2),
+#                                         keyword)) |>
+#   # CHARSET="ANSI";
+#   dplyr::mutate(s = ifelse(is.na(varname) & is.na(valname),
+#                            stringr::str_c(keyword_parsed, e, value_parsed, E),
+#                            keyword_parsed
+#   )) |>
+#   dplyr::mutate(
+#     # NOTE("age")="...";
+#     s = ifelse(!is.na(varname) & is.na(valname),
+#                stringr::str_c(keyword_parsed, oq, Q, varname, Q, eq, e, value_parsed, E),
+#                s
+#
+#     )) |>
+#   dplyr::mutate(
+#     # VALUENOTE("age", "0-15")="...";
+#     s = ifelse(!is.na(varname) & !is.na(valname),
+#                stringr::str_c(keyword_parsed, oq, Q, varname, Q, comma, Q, valname, Q, eq, e, value_parsed, E),
+#                s
+#     )
+#   ) |>
+#   dplyr::mutate(
+#     # TIMEVAL(”time”)=TLIST(A1), ”1994”, ”1995”,"1996”
+#     s = ifelse(keyword == "TIMEVAL" & language == main_lang,
+#                stringr::str_c(keyword_parsed, oq, Q, varname, Q, eq, "=TLIST(", valname, "), ", value_parsed, E),
+#                s
+#
+#     )) |>
+#   # TIMEVAL can only occur once, only for main lang
+#   filter(!(keyword == "TIMEVAL" & language != main_lang))
+#
+#
+# tmp |>
+#   sort_metadata_keywords() |>
+#   mutate(language = factor(language, levels = langs)) |>
+#   arrange(keyword, language) |> View()
+#
+#   arrange(language)
+#
+# if (full_dataframe) {
+#   tmp
+# } else {
+#   tmp |>
+#     dplyr::select(s)
+# }
