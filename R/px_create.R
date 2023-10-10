@@ -33,7 +33,8 @@ px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
   dplyr::select(csv, dplyr::all_of(col_order))
 }
 
-px_read_meta_csv("inst/extdata/metadata_example_multilingual.csv")
+
+
 
 
 #' Creates new px object from a tibble/data frame.
@@ -160,7 +161,9 @@ px_create <- function(
   #print("out2")
 
   # add timval values from .data
-  new_meta <- add_timevals_from_data_to_value(new_meta, .data, "time")
+  tvar <- new_meta |> filter(keyword=="TIMEVAL") |> pull(varname)
+
+  new_meta <- add_timevals_from_data_to_value(new_meta, .data, tvar)
   #print("ou3")
 
   # add dynamic title (multilingual)
