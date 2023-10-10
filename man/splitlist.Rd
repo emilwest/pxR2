@@ -17,6 +17,8 @@ Helper for metadata parser, splits a string to vector, adds quotes and joins bac
 }
 \examples{
 splitlist('2021,2022,2023')
+splitlist(c('2021,2022,2023', 'hej, hej'))
+splitlist(c(NA, 'hej, hej'))
 
 }
 \seealso{

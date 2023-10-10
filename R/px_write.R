@@ -1,5 +1,14 @@
 
 
+#' Write px object to a PX file
+#'
+#' @param .px_object px object as a list of a metadata tibble with a data tibble.
+#' @param file destination file, ending in .px
+#'
+#' @return saves to file
+#' @export
+#'
+#' @examples
 px_write <- function(.px_object, file) {
   data <- .px_object$data
   meta <- .px_object$metadata

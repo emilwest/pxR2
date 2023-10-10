@@ -4,10 +4,12 @@
 \alias{px_parse_metadata}
 \title{Parse px metadata tibble to px-formatted text.}
 \usage{
-px_parse_metadata(.metadata_df)
+px_parse_metadata(.metadata_df, full_dataframe = FALSE)
 }
 \arguments{
 \item{.metadata_df}{Metadata tibble as input to be converted to px-formatted text.}
+
+\item{full_dataframe}{If TRUE, return entire dataframe. Useful for debugging. Default FALSE.}
 }
 \value{
 Px-formatted text
