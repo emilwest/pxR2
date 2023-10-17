@@ -12,6 +12,9 @@
 px_write <- function(.px_object, file) {
   data <- .px_object$data
   meta <- .px_object$metadata
+  # format data according to stub and heading
+  data <- convert_data_to_final(meta, data)
+
   main_lang <- meta |> get_value_by_keyword("LANGUAGE")
   x <- meta |> get_value_by_keyword("STUB")
   if (length(x) > 1) {
@@ -20,14 +23,14 @@ px_write <- function(.px_object, file) {
     stubvec <- x[1] |> split_commas()
   }
 
-  decimals <- meta |> get_value_by_keyword("DECIMALS") |> as.numeric()
+
 
   # extract numbers from df only
   m <- data |>
     dplyr::select(-all_of(stubvec)) |>
     as.matrix()
   colnames(m) <- NULL
-  m <- round(m, decimals)
+  m <- ifelse(is.na(m), addquotes(".."), m)
 
   # one line per row
   datalines <- apply(format(m), 1, paste, collapse=" ")

@@ -65,13 +65,15 @@ px_get_main_language <- function(.metadata_df) {
 #'
 #' @examples
 #' px_get_values_from_data(ex_data)
-#' px_get_values_from_data(ex_data, as_list = T)
+#' px_get_values_from_data(ex_data, as_list = TRUE)
 px_get_values_from_data <- function(.data, as_list = FALSE) {
   assertthat::assert_that(any(names(.data) %in% "value"),
                           msg = "No column named value found in data frame, please add it.")
 
+  special_cols <- c("value", "pxvalue")
+
   levs <- .data %>%
-    dplyr::select(-value) %>%
+    dplyr::select(-any_of(special_cols)) %>%
     map(unique)
 
   assertthat::assert_that(length(levs)>0, msg = "Number of variables in dataframe is not greater than 0.")
@@ -103,6 +105,11 @@ px_add_values_from_data <- function(.metadata_df, .data) {
 
 
 
+get_special_colnames <- function() {
+  c("value", "pxvalue")
+}
+
+
 add_timevals_from_data_to_value <- function(.metadata_df, .data, time_variable) {
   timevals <- .data |> dplyr::select(dplyr::all_of(time_variable)) |> dplyr::pull() |> unique() |> str_c(collapse = ",")
   .metadata_df |>
@@ -128,7 +135,17 @@ convert_data_to_final <- function(.metadata_df, .data) {
   # print(.metadata_df)
   # print(ordning)
 
-  .data |>
+  decimals <- get_value_by_keyword(.metadata_df, "DECIMALS")
+
+  d <- dplyr::mutate(.data, value = round(value, decimals))
+  if(any(names(d)=="pxvalue")) {
+    d <- d |>
+      dplyr::mutate(value = dplyr::coalesce(addquotes(pxvalue), as.character(value))) |>
+      dplyr::select(-pxvalue)
+  }
+
+
+  d |>
     dplyr::select(all_of(ordning), value) |>
     tidyr::pivot_wider(names_from = all_of(heading), values_from = value)
 }
@@ -146,19 +163,81 @@ convert_data_to_final <- function(.metadata_df, .data) {
 #'
 #' @param .metadata_df metadata tibble to extract from
 #' @param .key keyword you want to get value from
+#' @param main_lang if TRUE, only return value for main language (default false)
 #'
 #' @return returns named vector of value(s) matching the keyword. If multilingual, the vector is named by the language.
+#' If the keyword is of type integer, it will be returned as integer.
 #' @export
 #'
 #' @examples
 #' get_value_by_keyword(meta_example, "STUB")
 #' get_value_by_keyword(metadata_example_multilingual, "STUB")
-get_value_by_keyword <- function(.metadata_df, .key) {
+#' get_value_by_keyword(metadata_example_multilingual, "STUB", main_lang = TRUE)
+#' get_value_by_keyword(metadata_example_multilingual, "TIMEVAL")
+#' get_value_by_keyword(metadata_example_multilingual, "TIMEVAL", main_lang = TRUE)
+#' get_value_by_keyword(metadata_example_multilingual, "DECIMALS")
+get_value_by_keyword <- function(.metadata_df, .key, main_lang=FALSE) {
   a <- .metadata_df %>%
     dplyr::filter(keyword==.key)
-  langs <- a$language
-  set_names(pull(a), langs)
+  b <- specs |>
+    dplyr::select(keyword = Keyword, Type)
+  c <- b |> dplyr::inner_join(a, by = "keyword")
+  c <- c |> dplyr::mutate(value = ifelse(Type == "integer", as.integer(value), value))
+  langs <- c$language
+  vals <- c$value
+  res <- set_names(vals, langs)
+  if (main_lang) {
+    lang <- px_get_main_language(.metadata_df)
+    if (!is.na(lang)) {
+      res[lang]
+    }
+  } else {
+    res
+  }
+
 }
+
+
+
+
+#' Check if keyword exists in metadata tibble
+#'
+#' @param .metadata_df metadata tibble
+#' @param .key keyword to check if it exists
+#'
+#' @return returns TRUE if keyword exists
+#' @export
+#'
+#' @examples
+#' keyword_exists(meta_example, "DECIMALS")
+#' keyword_exists(meta_example, "SHOWDECIMALS")
+#'
+keyword_exists <- function(.metadata_df, .key) {
+  a <- get_value_by_keyword(.metadata_df, .key)
+  ifelse(length(a)==0, FALSE, TRUE)
+}
+
+
+
+
+# x <- px_meta_add_keyword(px_meta_init_empty(),
+# keyword = c("SHOWDECIMALS", "DECIMALS"), value = c("3","6"))
+# get_final_rounding(x)
+
+# get_final_rounding <- function(.metadata_df) {
+#   decimals <- get_value_by_keyword(.metadata_df, "DECIMALS")
+#   res <- decimals
+#
+#   if(keyword_exists(.metadata_df, "SHOWDECIMALS")) {
+#     showdecimals <- get_value_by_keyword(.metadata_df, "SHOWDECIMALS")
+#     if (showdecimals > 6) {
+#       warning("SHOWDECIMALS > 6, must be between 0-6 and <= DECIMALS. Setting SHOWDECIMALS=6.")
+#       showdecimals <- 6
+#     }
+#     res <- ifelse(showdecimals <= decimals & showdecimals <= 6, showdecimals, decimals)
+#   }
+#   return(unname(res))
+# }
 
 
 #' Split commas in for example stub

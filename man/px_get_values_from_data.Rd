@@ -19,5 +19,5 @@ Extract values from dataframe/tibble into metadata tibble.
 }
 \examples{
 px_get_values_from_data(ex_data)
-px_get_values_from_data(ex_data, as_list = T)
+px_get_values_from_data(ex_data, as_list = TRUE)
 }

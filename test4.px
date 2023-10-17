@@ -2,8 +2,7 @@ CHARSET="ANSI";
 AXIS-VERSION="2013";
 CODEPAGE="iso-8859-15";
 LANGUAGE="en";
-LANGUAGES="en","sv";
-CREATION-DATE="20231002 16:15";
+CREATION-DATE="20231017 20:46";
 DECIMALS=1;
 SHOWDECIMALS=1;
 MATRIX="TEST01";
@@ -14,19 +13,18 @@ CONTENTS="Number of trees";
 UNITS="Number";
 STUB="sex","age";
 HEADING="time";
-VALUES("sex")="Female, hej","Male, hej2","Total, total3";
+VALUES("sex")="Female","Male","Total";
 VALUES("age")="0-15","16-25","26-50";
 VALUES("time")="2021","2022","2023";
-TIMEVAL("time")=TLIST(A1), "2021","2022","2023";
-LAST-UPDATED="20231002 16:15";
+LAST-UPDATED="20231017 20:46";
 DATA=
-16.9 20.9 15.8
-28.0 21.6 15.9
-22.4 23.7 22.9
-18.5 27.6 21.9
-16.9  8.9 25.6
-19.8 19.9 24.7
-24.1 23.0 24.6
-23.9 20.4 10.1
-23.1 19.7 19.2
+".." ".." ".."
+".." ".." ".."
+".." ".." ".."
+".." "."  "." 
+"."  "."  "." 
+"."  "."  "." 
+"."  "."  "-" 
+"-"  "-"  "-" 
+"-"  "-"  "-" 
 ;

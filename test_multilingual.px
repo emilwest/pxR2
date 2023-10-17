@@ -36,13 +36,13 @@ NOTE[sv]("ålder")="Detta är en fotnot för variabeln ålder.";
 VALUENOTE("age","0-15")="This is a specific footnote for the variable age with the variable value 0-15 years.";
 VALUENOTE[sv]("ålder","0-15")="Detta är en specifik fotnot för variabeln ålder med variabelvärdet 0-15 år.";
 DATA=
-16.87 20.92 15.82
-27.98 21.65 15.90
-22.44 23.69 22.88
-18.47 27.56 21.95
-16.89  8.93 25.62
-19.78 19.92 24.72
-24.11 22.97 24.59
-23.91 20.37 10.05
-23.10 19.72 19.22
+".." ".." ".."
+".." ".." ".."
+".." ".." ".."
+".." "."  "." 
+"."  "."  "." 
+"."  "."  "." 
+"."  "."  "-" 
+"-"  "-"  "-" 
+"-"  "-"  "-" 
 ;

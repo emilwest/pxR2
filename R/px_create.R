@@ -75,7 +75,6 @@ px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
 #' @param source States the organization which is responsible for the statistics or the sources used. Is shown with the footnote.
 #' If multiple sources are used, use # between each source. For example 'Statistics Sweden#Statistics Finland'.
 #' @param note General footnote for the table.
-#' @param show_data One of "wide" or "long" (original)
 #'
 #' @return Returns a list with two entries, one containing the metadata information and one for the data.
 #' @export
@@ -83,7 +82,7 @@ px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
 #' @examples
 #' px_obj <- px_create(.data = ex_data,
 #'           stub = "sex,age",
-#'           heading = c"time",
+#'           heading = "time",
 #'           time_variable = "time",
 #'           time_scale="annual",
 #'           matrix = "TEST01",
@@ -121,7 +120,6 @@ px_create <- function(
     contact = NULL,
     source = NULL,
     note = NULL,
-    show_data = "wide",
     ...
     ) {
 
@@ -161,28 +159,28 @@ px_create <- function(
   #print("out2")
 
   # add timval values from .data
-  tvar <- new_meta |> filter(keyword=="TIMEVAL") |> pull(varname)
+  if (is.null(time_variable)) {
+    lang <- px_get_main_language(new_meta)
+    time_variable <- new_meta |> filter(keyword=="TIMEVAL" & language == lang) |> pull(varname)
+  }
 
-  new_meta <- add_timevals_from_data_to_value(new_meta, .data, tvar)
+  new_meta <- add_timevals_from_data_to_value(new_meta, .data, time_variable)
   #print("ou3")
 
   # add dynamic title (multilingual)
   dynamic_title <- tibble::as_tibble(px_generate_dynamic_title(new_meta))
   new_meta <- bind_rows(new_meta, dynamic_title)
   # </Dynamically generated>
+
   #print("ou4")
   # final checks
   px_meta_validate(new_meta)
   #print("ou5")
   new_meta <- sort_metadata_keywords(new_meta)
   #print("ou55")
-  if (show_data == "wide") {
-    data <- convert_data_to_final(new_meta, .data)
-    #print("ou6")
-  }
 
   return(list(metadata = new_meta,
-              data = data))
+              data = .data))
 }
 
 

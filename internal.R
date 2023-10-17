@@ -83,8 +83,15 @@ px_write(px_obj)
 
 
 
+tt <- ex_data
+tt$value[1:10] <- NA
+tt$value
 
-px_obj <- px_create(ex_data,
+tt <- tt |>
+  mutate(pxvalue = c(rep(NA,10), rep(".", 10), rep("-", 7)))
+
+
+px_obj <- px_create(tt,
                     stub = "sex,age",
                     heading = "time",
                     time_variable = "time",
@@ -99,15 +106,50 @@ px_obj <- px_create(ex_data,
 )
 
 px_obj
+
 px_parse_metadata(px_obj$metadata)
+#
+# # extract numbers from df only
+# data <- px_obj$data
+#
+# if(any(names(data)=="pxvalue"))
+#
+# data |>
+#   mutate(value = coalesce(addquotes(pxvalue), as.character(value))) |> View()
+#   select(-pxvalue) |>
+#   tidyr::pivot_wider(names_from = time, values_from = value)
+#
+#
+# meta <- px_obj$metadata
+# # format data according to stub and heading
+#
+#
+# d <- convert_data_to_final(meta, data)
+#
+# m <- d |>
+#   dplyr::select(-c(sex,age)) |>
+#   as.matrix()
+#
+# m
+#
+# format(m)
+#
+# m <- ifelse(is.na(m), addquotes(".."), m)
+# m
+# x <- apply(format(m), 1, paste, collapse=" ")
+# x[8]
+#
+#
+# m[is.na(m),]
 
 px_write(px_obj, file = "test4.px")
 px_write(px_obj)
 
 
-b <- px_create(ex_data,
+b <- px_create(tt,
                meta_csv_path = "inst/extdata/metadata_example_multilingual.csv")
 
+b
 px_parse_metadata(b$metadata) |> View()
 
 x <- b$metadata |>

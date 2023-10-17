@@ -4,15 +4,18 @@
 \alias{get_value_by_keyword}
 \title{Get value from metadata tibble by keyword}
 \usage{
-get_value_by_keyword(.metadata_df, .key)
+get_value_by_keyword(.metadata_df, .key, main_lang = FALSE)
 }
 \arguments{
 \item{.metadata_df}{metadata tibble to extract from}
 
 \item{.key}{keyword you want to get value from}
+
+\item{main_lang}{if TRUE, only return value for main language (default false)}
 }
 \value{
 returns named vector of value(s) matching the keyword. If multilingual, the vector is named by the language.
+If the keyword is of type integer, it will be returned as integer.
 }
 \description{
 Get value from metadata tibble by keyword
@@ -20,4 +23,8 @@ Get value from metadata tibble by keyword
 \examples{
 get_value_by_keyword(meta_example, "STUB")
 get_value_by_keyword(metadata_example_multilingual, "STUB")
+get_value_by_keyword(metadata_example_multilingual, "STUB", main_lang = TRUE)
+get_value_by_keyword(metadata_example_multilingual, "TIMEVAL")
+get_value_by_keyword(metadata_example_multilingual, "TIMEVAL", main_lang = TRUE)
+get_value_by_keyword(metadata_example_multilingual, "DECIMALS")
 }

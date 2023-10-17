@@ -29,7 +29,6 @@ px_create(
   contact = NULL,
   source = NULL,
   note = NULL,
-  show_data = "wide",
   ...
 )
 }
@@ -89,8 +88,6 @@ Several persons can be stated in the same text string and are then divided by th
 If multiple sources are used, use # between each source. For example 'Statistics Sweden#Statistics Finland'.}
 
 \item{note}{General footnote for the table.}
-
-\item{show_data}{One of "wide" or "long" (original)}
 }
 \value{
 Returns a list with two entries, one containing the metadata information and one for the data.
@@ -102,7 +99,7 @@ Creates all necessary metadata and generates VALUE keywords dynamically based on
 \examples{
 px_obj <- px_create(.data = ex_data,
           stub = "sex,age",
-          heading = c"time",
+          heading = "time",
           time_variable = "time",
           time_scale="annual",
           matrix = "TEST01",
