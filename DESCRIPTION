@@ -25,7 +25,9 @@ Imports:
     glue,
     lifecycle,
     rlang,
-    Rcpp
+    Rcpp,
+    readr,
+    assertthat
 LinkingTo: 
     Rcpp,
     BH

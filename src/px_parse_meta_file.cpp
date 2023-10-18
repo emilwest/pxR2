@@ -46,63 +46,6 @@ std::string extractLastNChars(std::string const &str, unsigned int n) {
   return str.substr(str.size() - n);
 }
 
-//' Gets encoding from px file in CODEPAGE keyword.
-//'
-//' If CODEPAGE is not found within the first 100 lines
-//' or until DATA keyword is found,
-//' the encoding will be guessed with charset detection.
-//'
-//' @param path File path to px file
-//'
-//
-// static std::string get_encoding(const std::string& path) {
-//
-//   std::string myencoding;
-//
-//   if (path.substr(path.size() - 3) == ".px") {
-//     std::ifstream tr(path);
-//     std::string line;
-//     int lineCount = 1;
-//
-//     while (lineCount <= 100 && std::getline(tr, line) && line.find("DATA=") != 0) {
-//       if (line.find("CODEPAGE=") == 0) {
-//         myencoding = line.substr(line.find("\"") + 1);
-//         myencoding = myencoding.substr(0, myencoding.rfind("\""));
-//       }
-//       lineCount++;
-//     }
-//   }
-//
-//   // std::string cs;
-//   // const int BUFFER_SIZE = 1024;
-//   // char buffer[BUFFER_SIZE];
-//   // int size = 0;
-//   // std::ifstream fs(path, std::ifstream::binary);
-//   //
-//   // if (fs.is_open()) {
-//   //   Ude::CharsetDetector det;
-//   //   size = std::min(BUFFER_SIZE, static_cast<int>(fs.tellg()));
-//   //   fs.read(buffer, size);
-//   //   det.Feed(buffer, size);
-//   //   det.DataEnd();
-//   //   cs = det.Charset;
-//   // }
-//   //
-//   // if (cs.empty()) {
-//   //   return "default"; // Replace with actual default encoding
-//   // }
-//   //
-//   // // Fix it if it is ASCII; it is probably the codepage of the machine
-//   // if (cs.compare("ASCII") == 0) {
-//   //   return "default"; // Replace with actual default encoding
-//   // }
-//   //
-//
-//   return myencoding;
-// }
-
-
-
 
 
 

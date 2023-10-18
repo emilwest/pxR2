@@ -1,7 +1,7 @@
 
 # todo: add encoding detection in c++
 px_extract_meta_from_file <- function(file) {
-  tibble::tibble(dplyr::bind_rows(px_parse_meta_file(file)))
+  dplyr::tibble(dplyr::bind_rows(px_parse_meta_file(file)))
 }
 
 #?pxR2::px_parse_meta_string()

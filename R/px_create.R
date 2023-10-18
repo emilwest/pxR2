@@ -41,6 +41,8 @@ px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
 #' Creates all necessary metadata and generates VALUE keywords dynamically based on the variable levels in the data frame.
 #'
 #' @param .data Mandatory. Dataframe/tibble in long format with one column called 'value'.
+#' @param meta_csv_path Path to metadata csv (;-delimited)
+#' @param codes_csv_path Path to codes csv (;-delimited)
 #' @param stub Mandatory. Variables to display along the rows. Supply as a comma separated string, for example 'country,age,'
 #' @param heading Mandatory. Variables to display along the columns.
 #' @param time_variable Name of the time variable, if it exists.
@@ -119,8 +121,7 @@ px_create <- function(
     last_updated = format(Sys.time(), "%Y%m%d %H:%M"),
     contact = NULL,
     source = NULL,
-    note = NULL,
-    ...
+    note = NULL
     ) {
 
   if (!is.null(meta_csv_path)) {
@@ -168,7 +169,7 @@ px_create <- function(
   #print("ou3")
 
   # add dynamic title (multilingual)
-  dynamic_title <- tibble::as_tibble(px_generate_dynamic_title(new_meta))
+  dynamic_title <- dplyr::as_tibble(px_generate_dynamic_title(new_meta))
   new_meta <- bind_rows(new_meta, dynamic_title)
   # </Dynamically generated>
 

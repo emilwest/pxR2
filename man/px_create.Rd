@@ -28,12 +28,15 @@ px_create(
   last_updated = format(Sys.time(), "\%Y\%m\%d \%H:\%M"),
   contact = NULL,
   source = NULL,
-  note = NULL,
-  ...
+  note = NULL
 )
 }
 \arguments{
 \item{.data}{Mandatory. Dataframe/tibble in long format with one column called 'value'.}
+
+\item{meta_csv_path}{Path to metadata csv (;-delimited)}
+
+\item{codes_csv_path}{Path to codes csv (;-delimited)}
 
 \item{stub}{Mandatory. Variables to display along the rows. Supply as a comma separated string, for example 'country,age,'}
 

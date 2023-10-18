@@ -126,6 +126,7 @@ add_timevals_from_data_to_value <- function(.metadata_df, .data, time_variable) 
 #' @export
 #'
 #' @examples
+#' convert_data_to_final(metadata_example_multilingual, ex_data)
 convert_data_to_final <- function(.metadata_df, .data) {
   main_lang <- get_value_by_keyword(.metadata_df, "LANGUAGE") |> split_commas()
   .metadata_df <- .metadata_df |>  filter(language == main_lang | is.na(language))
@@ -249,7 +250,6 @@ keyword_exists <- function(.metadata_df, .key) {
 #'
 #' @examples
 #' get_value_by_keyword(meta_example, "STUB") |> split_commas()
-#' get_value_by_keyword(metadata_example_multilingual, "STUB") |> map(split_commas)
 split_commas <- function(.values) {
   .values |>
         str_split_1(",") |>
@@ -294,7 +294,7 @@ px_generate_dynamic_title <- function(.metadata_df) {
   heading <- get_value_by_keyword(.metadata_df, "HEADING")
 
   translation_matrix <-
-    tibble::tribble(
+    dplyr::tribble(
       ~language, ~by, ~and,
       "sv", "efter", "och",
       "en", "by", "and"

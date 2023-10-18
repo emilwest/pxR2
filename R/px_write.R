@@ -9,6 +9,24 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' px_obj <- px_create(tt,
+#' stub = "sex,age",
+#' heading = "time",
+#' time_variable = "time",
+#' time_scale = "annual",
+#' matrix = "TEST01",
+#' subject_area = "Forestry",
+#' subject_code = "F",
+#' units = "Number",
+#' contents = "Number of trees",
+#' decimals = 1,
+#' language = "en"
+#' )
+#'
+#' px_write(px_obf, "./test.px")
+#' }
+
 px_write <- function(.px_object, file) {
   data <- .px_object$data
   meta <- .px_object$metadata
