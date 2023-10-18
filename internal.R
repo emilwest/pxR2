@@ -83,15 +83,8 @@ px_write(px_obj)
 
 
 
-tt <- ex_data
-tt$value[1:10] <- NA
-tt$value
-
-tt <- tt |>
-  mutate(pxvalue = c(rep(NA,10), rep(".", 10), rep("-", 7)))
-
-
-px_obj <- px_create(tt,
+ex_data
+px_obj <- px_create(ex_data,
                     stub = "sex,age",
                     heading = "time",
                     time_variable = "time",
@@ -106,6 +99,10 @@ px_obj <- px_create(tt,
 )
 
 px_obj
+
+
+
+
 
 px_parse_metadata(px_obj$metadata)
 #
