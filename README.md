@@ -90,7 +90,7 @@ px_obj
 
 # Save object
 
-px_write(px_obj, "somepath/TET01.px")
+px_write(px_obj, "somepath/TEST01.px")
 ```
 
 
