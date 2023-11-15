@@ -27,4 +27,5 @@ This is a wrapper around \code{\link[readr:read_delim]{readr::read_delim()}} whi
 }
 \examples{
 try(px_read_meta_csv("metadata.csv"))
+try(px_read_meta_csv("inst/extdata/metadata_example.csv"))
 }

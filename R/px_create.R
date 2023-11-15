@@ -179,8 +179,15 @@ px_create <- function(
 
   # add timval values from .data
   if (is.null(time_variable)) {
+    l <- length(px_get_languages(new_meta))
     lang <- px_get_main_language(new_meta)
-    time_variable <- new_meta |> filter(keyword=="TIMEVAL" & language == lang) |> pull(varname)
+    if (l > 1) {
+      time_variable <- new_meta |> filter(keyword=="TIMEVAL" & language == lang) |> pull(varname)
+    } else if (l==1) {
+    } else {
+      warning("LANGUAGE is missing from px file.")
+      time_variable <- new_meta |> filter(keyword=="TIMEVAL" & is.na(language)) |> pull(varname)
+    }
   }
 
   new_meta <- add_timevals_from_data_to_value(new_meta, .data, time_variable)

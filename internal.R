@@ -142,10 +142,14 @@ px_parse_metadata(px_obj$metadata)
 px_write(px_obj, file = "test4.px")
 px_write(px_obj)
 
+pxR2::ex_data
+metadata_example_multilingual
 
-b <- px_create(tt,
+b <- px_create(pxR2::ex_data,
                meta_csv_path = "inst/extdata/metadata_example_multilingual.csv")
 
+
+meta_example
 b
 px_parse_metadata(b$metadata) |> View()
 
