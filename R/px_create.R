@@ -32,19 +32,19 @@
 #' @param path path to csv file
 #' @param delim delimiter, semicolon by default
 #' @param encoding utf-8 by default
-#' @param ... other parameters
 #'
 #' @return returns metadata tibble
 #' @export
 #'
 #' @examples
 #' try(px_read_meta_csv("metadata.csv"))
-px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
+#' try(px_read_meta_csv("inst/extdata/metadata_example.csv"))
+px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8") {
   assertthat::assert_that(substring(path, nchar(path)-2)=="csv", msg = "The path must be a csv with ; as separator")
   csv <- readr::read_delim(path,
                     delim = delim,
                     col_types = readr::cols(.default = "c"),
-                    locale = readr::locale(encoding = encoding, ...)
+                    locale = readr::locale(encoding = encoding)
   )
   col_order <- c("keyword", "language", "varname", "valname", "value")
   assertthat::assert_that(all(names(csv) %in% col_order), msg = "The metadata csv must contain the columns: keyword, language, varname, valname and value")
@@ -95,7 +95,6 @@ px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
 #' @param source States the organization which is responsible for the statistics or the sources used. Is shown with the footnote.
 #' If multiple sources are used, use # between each source. For example 'Statistics Sweden#Statistics Finland'.
 #' @param note General footnote for the table.
-#' @param ... Additional arguments
 #'
 #' @return Returns a list with two entries, one containing the metadata information and one for the data.
 #' @export
@@ -140,8 +139,7 @@ px_create <- function(
     last_updated = format(Sys.time(), "%Y%m%d %H:%M"),
     contact = NULL,
     source = NULL,
-    note = NULL,
-    ...
+    note = NULL
     ) {
 
   if (!is.null(meta_csv_path)) {

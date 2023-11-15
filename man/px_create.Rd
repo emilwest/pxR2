@@ -28,8 +28,7 @@ px_create(
   last_updated = format(Sys.time(), "\%Y\%m\%d \%H:\%M"),
   contact = NULL,
   source = NULL,
-  note = NULL,
-  ...
+  note = NULL
 )
 }
 \arguments{
@@ -92,8 +91,6 @@ Several persons can be stated in the same text string and are then divided by th
 If multiple sources are used, use # between each source. For example 'Statistics Sweden#Statistics Finland'.}
 
 \item{note}{General footnote for the table.}
-
-\item{...}{Additional arguments}
 }
 \value{
 Returns a list with two entries, one containing the metadata information and one for the data.

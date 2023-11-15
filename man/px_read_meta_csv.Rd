@@ -4,7 +4,7 @@
 \alias{px_read_meta_csv}
 \title{Read metadata csv raw file into a tibble}
 \usage{
-px_read_meta_csv(path, delim = ";", encoding = "UTF-8", ...)
+px_read_meta_csv(path, delim = ";", encoding = "UTF-8")
 }
 \arguments{
 \item{path}{path to csv file}
@@ -12,8 +12,6 @@ px_read_meta_csv(path, delim = ";", encoding = "UTF-8", ...)
 \item{delim}{delimiter, semicolon by default}
 
 \item{encoding}{utf-8 by default}
-
-\item{...}{other parameters}
 }
 \value{
 returns metadata tibble
