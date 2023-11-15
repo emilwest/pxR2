@@ -184,6 +184,7 @@ px_create <- function(
     if (l > 1) {
       time_variable <- new_meta |> filter(keyword=="TIMEVAL" & language == lang) |> pull(varname)
     } else if (l==1) {
+      time_variable <- new_meta |> filter(keyword=="TIMEVAL" & (language == lang | is.na(language))) |> pull(varname)
     } else {
       warning("LANGUAGE is missing from px file.")
       time_variable <- new_meta |> filter(keyword=="TIMEVAL" & is.na(language)) |> pull(varname)
