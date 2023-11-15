@@ -146,7 +146,7 @@ px_create <- function(
 
   if (!is.null(meta_csv_path)) {
 
-    new_meta <- px_read_meta_csv(meta_csv_path, ...)
+    new_meta <- px_read_meta_csv(meta_csv_path)
     # print("in")
 
   } else {
