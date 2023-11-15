@@ -95,6 +95,7 @@ px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
 #' @param source States the organization which is responsible for the statistics or the sources used. Is shown with the footnote.
 #' If multiple sources are used, use # between each source. For example 'Statistics Sweden#Statistics Finland'.
 #' @param note General footnote for the table.
+#' @param ... Additional arguments
 #'
 #' @return Returns a list with two entries, one containing the metadata information and one for the data.
 #' @export
@@ -139,7 +140,8 @@ px_create <- function(
     last_updated = format(Sys.time(), "%Y%m%d %H:%M"),
     contact = NULL,
     source = NULL,
-    note = NULL
+    note = NULL,
+    ...
     ) {
 
   if (!is.null(meta_csv_path)) {
