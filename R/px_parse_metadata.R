@@ -5,7 +5,6 @@
 #' @param txt Text string to add quotes around
 #'
 #' @return Text string with added quotes
-#' @export
 #'
 #' @seealso [splitlist()] for adding quotes to each element in a vector and joining to single string, and
 #'  [px_parse_metadata()] for parsing metadata to text
@@ -26,7 +25,6 @@ addquotes <- function(txt) {
 #' @param txt Text vector with comma-separated values, e.g. '2021,2022,2023'
 #'
 #' @return Returns texts vector with added quotes around values, e.g '"\"2021\",\"2022\",\"2023\""'
-#' @export
 #'
 #' @seealso [addquotes()], [px_parse_metadata()]
 #'
@@ -59,7 +57,6 @@ splitlist <- function(txt) {
 #' @param full_dataframe If TRUE, return entire dataframe. Useful for debugging. Default FALSE.
 #'
 #' @return Px-formatted text
-#' @export
 #'
 #' @examples
 #'

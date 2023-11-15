@@ -113,5 +113,6 @@
 #'   \item{Note}{Description of keyword.}
 #' }
 #' @source <https://www.scb.se/globalassets/vara-tjanster/px-programmen/px-file_format_specification_2013.pdf>
+#' @export
 "specs"
 

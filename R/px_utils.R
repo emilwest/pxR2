@@ -5,7 +5,6 @@
 #' @param .metadata_df  Metadata tibble
 #'
 #' @return Returns character vector of languages or NA_character_ if undefined.
-#' @export
 #'
 #' @examples
 #' px_get_languages(meta_example)
@@ -27,7 +26,6 @@ px_get_languages <- function(.metadata_df) {
 #' @param .metadata_df Metadata tibble.
 #'
 #' @return Returns the main language as character vector.
-#' @export
 #'
 #' @examples
 #' px_get_main_language(meta_example)
@@ -61,7 +59,6 @@ px_get_main_language <- function(.metadata_df) {
 #' @param as_list If TRUE, all unique variable values are returned as a list.
 #'
 #' @return Returns metadata tibble or list with extracted unique variable values
-#' @export
 #'
 #' @examples
 #' px_get_values_from_data(ex_data)
@@ -168,7 +165,6 @@ convert_data_to_final <- function(.metadata_df, .data) {
 #'
 #' @return returns named vector of value(s) matching the keyword. If multilingual, the vector is named by the language.
 #' If the keyword is of type integer, it will be returned as integer.
-#' @export
 #'
 #' @examples
 #' get_value_by_keyword(meta_example, "STUB")
@@ -207,7 +203,6 @@ get_value_by_keyword <- function(.metadata_df, .key, main_lang=FALSE) {
 #' @param .key keyword to check if it exists
 #'
 #' @return returns TRUE if keyword exists
-#' @export
 #'
 #' @examples
 #' keyword_exists(meta_example, "DECIMALS")
@@ -246,7 +241,6 @@ keyword_exists <- function(.metadata_df, .key) {
 #' @param .values single string with commas
 #'
 #' @return splitted vector
-#' @export
 #'
 #' @examples
 #' get_value_by_keyword(meta_example, "STUB") |> split_commas()
@@ -264,7 +258,6 @@ split_commas <- function(.values) {
 #' @param .metadata_df metadata tibble to extract from
 #'
 #' @return returns single string as dynamically generated title.
-#' @export
 #'
 #' @examples
 #' px_generate_dynamic_title(meta_example)

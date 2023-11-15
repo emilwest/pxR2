@@ -3,7 +3,6 @@
 #' Initialize empty px metadata tibble
 #'
 #' @return Returns empty px metadata tibble
-#' @export
 #'
 #' @examples
 #' px_meta_init_empty()
@@ -20,7 +19,6 @@ px_meta_init_empty <- function() {
 #' @param value Mandatory. The text you want to add.
 #'
 #' @return Filled px metadata tibble
-#' @export
 #'
 #' @examples
 #' px_meta_init_unempty("VALUENOTE", "", "age", "15-20 years", "Preliminary figures")
@@ -49,7 +47,6 @@ px_meta_init_unempty <- function(keyword,
 #' @param value Mandatory. The text you want to add.
 #'
 #' @return Metadata tibble
-#' @export
 #'
 #' @examples
 #' px_meta_add_keyword(meta_example, "VALUENOTE", NA, "typ", "typ value", "Preliminary figures")
@@ -104,7 +101,6 @@ px_meta_add_keyword <- function(
 #' Choose weekly format if the time variable is formatted as CCYYWW (M is 1-52).
 #'
 #' @return Metadata tibble
-#' @export
 #'
 #' @examples
 #' meta_example |>

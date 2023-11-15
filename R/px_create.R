@@ -21,6 +21,24 @@
 # - add various examples for creating new px files
 
 
+
+#' Read metadata csv raw file into a tibble
+#'
+#' This is a wrapper around [readr::read_delim()] which checks that the csv is valid:
+#'
+#' - ; separated
+#' - must contain the columns: keyword, language, varname, valname and value
+#'
+#' @param path path to csv file
+#' @param delim delimiter, semicolon by default
+#' @param encoding utf-8 by default
+#' @param ... other parameters
+#'
+#' @return returns metadata tibble
+#' @export
+#'
+#' @examples
+#' try(px_read_meta_csv("metadata.csv"))
 px_read_meta_csv <- function(path, delim = ";", encoding = "UTF-8", ...) {
   assertthat::assert_that(substring(path, nchar(path)-2)=="csv", msg = "The path must be a csv with ; as separator")
   csv <- readr::read_delim(path,
