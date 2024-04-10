@@ -1,7 +1,7 @@
 Package: pxR2
 Type: Package
 Title: Read and Write PX Data
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: 
     person("Emil", "Westin", , "emilwestin@gmail.com", role = c("aut", "cre"))
 Description: The goal of pxR2 is to provide a faster and easier way to read 
