@@ -1,10 +1,15 @@
 
 
-px_meta_check_mandatory <- function(.metadata_df) {
+px_meta_check_mandatory <- function(.metadata_df, exclude = NULL) {
   mandatory_vars <- specs %>%
     dplyr::filter(Mandatory == TRUE) %>%
     dplyr::filter(Keyword != "DATA") %>%
     dplyr::select(Keyword)
+
+  if (!is.null(exclude)) {
+    mandatory_vars <- mandatory_vars |>
+      filter(!(Keyword %in% exclude))
+  }
 
   missing <- mandatory_vars %>%
     dplyr::anti_join(.metadata_df, by = c("Keyword" = "keyword"))
@@ -69,6 +74,7 @@ px_meta_validate <- function(.metadata_df) {
 
 # px_meta_validate(x)
 
+# get varnames as defined in stub and heading
 get_varnames <- function(.metadata_df) {
   .metadata_df %>%
     dplyr::filter(keyword %in% c("STUB", "HEADING")) %>%
@@ -101,9 +107,30 @@ px_meta_compare_varnames <- function(.metadata_df_new, .metadata_df) {
                           msg = str_c("At least one variable name in the varname column is not found in STUB and HEADING: ",
                           l,
                           ".\nEither add the variable name to the STUB or HEADING or check the spelling of the varname.",
+                          "\nThe variable names are case-sensitive.",
                           "\n Valid varnames: ", xx
                           )
                           )
 }
 
 #px_meta_compare_varnames(x, x)
+
+
+
+
+# px_meta_check_mandatory(pxR2::meta_example, exclude = c("VALUES", "TITLE"))
+# px_meta_check_if_language_dependent_ok(meta_example)
+# px_meta_check_if_keywords_are_valid(meta_example)
+#
+# px_meta_validate(meta_example)
+#
+#
+#
+# meta <- px_read_meta_csv("MARIA03.csv")
+# xx <- try(px_meta_compare_varnames(meta, meta))
+# try(px_meta_check_mandatory(meta, exclude = c("VALUES", "TITLE")))
+# try(px_meta_check_if_language_dependent_ok(meta))
+#
+#
+# get_varnames(meta)
+
