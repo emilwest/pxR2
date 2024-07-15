@@ -16,6 +16,9 @@ returns single string as dynamically generated title.
 Generate dynamic TITLE based on LANGUAGE, STUB and HEADING
 }
 \examples{
+\dontrun{
 px_generate_dynamic_title(meta_example)
 px_generate_dynamic_title(metadata_example_multilingual)
 }
+}
+\keyword{internal}

@@ -18,7 +18,9 @@ returns TRUE if keyword exists
 Check if keyword exists in metadata tibble
 }
 \examples{
+\dontrun{
 keyword_exists(meta_example, "DECIMALS")
 keyword_exists(meta_example, "SHOWDECIMALS")
-
 }
+}
+\keyword{internal}

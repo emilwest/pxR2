@@ -5,7 +5,10 @@
 #' @return Returns empty px metadata tibble
 #'
 #' @examples
+#' \dontrun{
 #' px_meta_init_empty()
+#' }
+#' @keywords internal
 px_meta_init_empty <- function() {
   dplyr::tibble(keyword=character(),  language=character(), varname=character(),  valname=character(),  value=character())
 }
@@ -21,10 +24,13 @@ px_meta_init_empty <- function() {
 #' @return Filled px metadata tibble
 #'
 #' @examples
+#' \dontrun{
 #' px_meta_init_unempty("VALUENOTE", "", "age", "15-20 years", "Preliminary figures")
 #' px_meta_init_unempty("valuenote", "", "age", "15-20 years", "Preliminary figures")
 #' px_meta_init_unempty("STUB", "", "", "", "age,sex")
 #' # will throw error if keyword is not valid according to PX Specifications
+#' }
+#' @keywords internal
 px_meta_init_unempty <- function(keyword,
                                  language,
                                  varname,
@@ -49,8 +55,11 @@ px_meta_init_unempty <- function(keyword,
 #' @return Metadata tibble
 #'
 #' @examples
+#' \dontrun{
 #' px_meta_add_keyword(meta_example, "VALUENOTE", NA, "typ", "typ value", "Preliminary figures")
 #' px_meta_add_keyword(meta_example, "VALUENOTE", NA, NA, NA, c("age","sex"))
+#' }
+#' @keywords internal
 px_meta_add_keyword <- function(
     metadata,
   keyword,
@@ -103,9 +112,12 @@ px_meta_add_keyword <- function(
 #' @return Metadata tibble
 #'
 #' @examples
+#' \dontrun{
 #' meta_example |>
 #' dplyr::filter(keyword != "TIMEVAL") |>
 #' px_meta_add_timeval("år", "annual")
+#' }
+#' @keywords internal
 px_meta_add_timeval <- function(.metadata_df,
                         time_variable,
                         time_scale # A1/annual, H1/halfyear, Q1/quarterly, M1 monthly, W1/weekly

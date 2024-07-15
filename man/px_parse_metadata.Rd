@@ -17,9 +17,4 @@ Px-formatted text
 \description{
 Parse px metadata tibble to px-formatted text.
 }
-\examples{
-
-px_parse_metadata(meta_example)
-px_parse_metadata(metadata_example_multilingual)
-
-}
+\keyword{internal}

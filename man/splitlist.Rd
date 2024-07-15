@@ -15,12 +15,7 @@ Returns texts vector with added quotes around values, e.g '"\"2021\",\"2022\",\"
 \description{
 Helper for metadata parser, splits a string to vector, adds quotes and joins back with commas.
 }
-\examples{
-splitlist('2021,2022,2023')
-splitlist(c('2021,2022,2023', 'hej, hej'))
-splitlist(c(NA, 'hej, hej'))
-
-}
 \seealso{
 \code{\link[=addquotes]{addquotes()}}, \code{\link[=px_parse_metadata]{px_parse_metadata()}}
 }
+\keyword{internal}

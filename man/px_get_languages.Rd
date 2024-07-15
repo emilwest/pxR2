@@ -18,6 +18,9 @@ Helper function to extract LANGUAGES from metadata tibble as a character vector.
 If not defined, NA_character_ is returned.
 }
 \examples{
+\dontrun{
 px_get_languages(meta_example)
 px_get_languages(metadata_example_multilingual)
 }
+}
+\keyword{internal}

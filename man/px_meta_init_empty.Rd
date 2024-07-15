@@ -13,5 +13,8 @@ Returns empty px metadata tibble
 Initialize empty px metadata tibble
 }
 \examples{
+\dontrun{
 px_meta_init_empty()
 }
+}
+\keyword{internal}

@@ -19,6 +19,4 @@ Returns tibble in wide format according to order of STUB and HEADING
 Convert data in long format into same format according to STUB and HEADING.
 The dataframe column names are assumed to come from the main language defined in the LANGUAGE keyword.
 }
-\examples{
-convert_data_to_final(metadata_example_multilingual, ex_data)
-}
+\keyword{internal}

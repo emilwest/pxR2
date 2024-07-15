@@ -8,6 +8,7 @@
 #'
 #' @seealso [splitlist()] for adding quotes to each element in a vector and joining to single string, and
 #'  [px_parse_metadata()] for parsing metadata to text
+#' @keywords internal
 addquotes <- function(txt) {
   Q <- '"'
   stringr::str_c(Q, txt, Q)
@@ -22,6 +23,7 @@ addquotes <- function(txt) {
 #' @return Returns texts vector with added quotes around values, e.g '"\"2021\",\"2022\",\"2023\""'
 #'
 #' @seealso [addquotes()], [px_parse_metadata()]
+#' @keywords internal
 splitlist <- function(txt) {
   txt[is.na(txt)] <- NA_character_
   assertthat::assert_that(is.character(txt), msg = "Input must be a character vector")
@@ -46,6 +48,7 @@ splitlist <- function(txt) {
 #' @param full_dataframe If TRUE, return entire dataframe. Useful for debugging. Default FALSE.
 #'
 #' @return Px-formatted text
+#' @keywords internal
 px_parse_metadata <- function(.metadata_df, full_dataframe = FALSE) {
 
   Q <- '"'

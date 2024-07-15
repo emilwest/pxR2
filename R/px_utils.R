@@ -7,8 +7,11 @@
 #' @return Returns character vector of languages or NA_character_ if undefined.
 #'
 #' @examples
+#' \dontrun{
 #' px_get_languages(meta_example)
 #' px_get_languages(metadata_example_multilingual)
+#' }
+#' @keywords internal
 px_get_languages <- function(.metadata_df) {
   langs <- get_value_by_keyword(.metadata_df, "LANGUAGES")
   if (length(langs) > 0) {
@@ -28,6 +31,7 @@ px_get_languages <- function(.metadata_df) {
 #' @return Returns the main language as character vector.
 #'
 #' @examples
+#' \dontrun{
 #' px_get_main_language(meta_example)
 #' px_get_main_language(metadata_example_multilingual)
 #'
@@ -39,7 +43,8 @@ px_get_languages <- function(.metadata_df) {
 #'
 #' px_meta_init_unempty(keyword="LANGUAGE", NA, NA, NA, value = "en") |>
 #' px_get_main_language()
-#'
+#' }
+#' @keywords internal
 px_get_main_language <- function(.metadata_df) {
   main_lang <- get_value_by_keyword(.metadata_df, "LANGUAGE") |> unname()
   if (length(main_lang)==0) {
@@ -61,8 +66,11 @@ px_get_main_language <- function(.metadata_df) {
 #' @return Returns metadata tibble or list with extracted unique variable values
 #'
 #' @examples
+#' \dontrun{
 #' px_get_values_from_data(ex_data)
 #' px_get_values_from_data(ex_data, as_list = TRUE)
+#' }
+#' @keywords internal
 px_get_values_from_data <- function(.data, as_list = FALSE) {
   assertthat::assert_that(any(names(.data) %in% "value"),
                           msg = "No column named value found in data frame, please add it.")
@@ -120,10 +128,8 @@ add_timevals_from_data_to_value <- function(.metadata_df, .data, time_variable) 
 #' @param .data Data tibble in long format
 #'
 #' @return Returns tibble in wide format according to order of STUB and HEADING
-#' @export
 #'
-#' @examples
-#' convert_data_to_final(metadata_example_multilingual, ex_data)
+#' @keywords internal
 convert_data_to_final <- function(.metadata_df, .data) {
   main_lang <- get_value_by_keyword(.metadata_df, "LANGUAGE") |> split_commas()
   .metadata_df <- .metadata_df |>  filter(language == main_lang | is.na(language))
@@ -167,12 +173,15 @@ convert_data_to_final <- function(.metadata_df, .data) {
 #' If the keyword is of type integer, it will be returned as integer.
 #'
 #' @examples
+#' \dontrun{
 #' get_value_by_keyword(meta_example, "STUB")
 #' get_value_by_keyword(metadata_example_multilingual, "STUB")
 #' get_value_by_keyword(metadata_example_multilingual, "STUB", main_lang = TRUE)
 #' get_value_by_keyword(metadata_example_multilingual, "TIMEVAL")
 #' get_value_by_keyword(metadata_example_multilingual, "TIMEVAL", main_lang = TRUE)
 #' get_value_by_keyword(metadata_example_multilingual, "DECIMALS")
+#' }
+#' @keywords internal
 get_value_by_keyword <- function(.metadata_df, .key, main_lang=FALSE) {
   a <- .metadata_df %>%
     dplyr::filter(keyword==.key)
@@ -205,9 +214,11 @@ get_value_by_keyword <- function(.metadata_df, .key, main_lang=FALSE) {
 #' @return returns TRUE if keyword exists
 #'
 #' @examples
+#' \dontrun{
 #' keyword_exists(meta_example, "DECIMALS")
 #' keyword_exists(meta_example, "SHOWDECIMALS")
-#'
+#' }
+#' @keywords internal
 keyword_exists <- function(.metadata_df, .key) {
   a <- get_value_by_keyword(.metadata_df, .key)
   ifelse(length(a)==0, FALSE, TRUE)
@@ -243,7 +254,10 @@ keyword_exists <- function(.metadata_df, .key) {
 #' @return splitted vector
 #'
 #' @examples
+#' \dontrun{
 #' get_value_by_keyword(meta_example, "STUB") |> split_commas()
+#' }
+#' @keywords internal
 split_commas <- function(.values) {
   .values |>
         str_split_1(",") |>
@@ -260,8 +274,11 @@ split_commas <- function(.values) {
 #' @return returns single string as dynamically generated title.
 #'
 #' @examples
+#' \dontrun{
 #' px_generate_dynamic_title(meta_example)
 #' px_generate_dynamic_title(metadata_example_multilingual)
+#' }
+#' @keywords internal
 px_generate_dynamic_title <- function(.metadata_df) {
   multilingual <- FALSE
 

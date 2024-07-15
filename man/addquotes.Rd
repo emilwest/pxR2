@@ -15,12 +15,8 @@ Text string with added quotes
 \description{
 Helper for metadata parser, adds quotes around values in a string
 }
-\examples{
-addquotes('2021')
-addquotes(c("2021","2022","2023"))
-
-}
 \seealso{
 \code{\link[=splitlist]{splitlist()}} for adding quotes to each element in a vector and joining to single string, and
 \code{\link[=px_parse_metadata]{px_parse_metadata()}} for parsing metadata to text
 }
+\keyword{internal}

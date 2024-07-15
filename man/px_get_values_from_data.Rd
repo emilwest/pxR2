@@ -18,6 +18,9 @@ Returns metadata tibble or list with extracted unique variable values
 Extract values from dataframe/tibble into metadata tibble.
 }
 \examples{
+\dontrun{
 px_get_values_from_data(ex_data)
 px_get_values_from_data(ex_data, as_list = TRUE)
 }
+}
+\keyword{internal}

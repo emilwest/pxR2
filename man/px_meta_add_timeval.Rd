@@ -25,7 +25,10 @@ Metadata tibble
 Add time value information to px metadata tibble
 }
 \examples{
+\dontrun{
 meta_example |>
 dplyr::filter(keyword != "TIMEVAL") |>
 px_meta_add_timeval("år", "annual")
 }
+}
+\keyword{internal}

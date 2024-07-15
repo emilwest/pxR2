@@ -20,6 +20,7 @@ If LANGUAGE keyword exists, that is assumed to be the main language.
 If LANGUAGE keyword doesn't exist, but LANGUAGES does, the first language of LANGUAGES is assumed to be the main language.
 }
 \examples{
+\dontrun{
 px_get_main_language(meta_example)
 px_get_main_language(metadata_example_multilingual)
 
@@ -31,5 +32,6 @@ px_get_main_language()
 
 px_meta_init_unempty(keyword="LANGUAGE", NA, NA, NA, value = "en") |>
 px_get_main_language()
-
 }
+}
+\keyword{internal}

@@ -87,6 +87,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
       //std::cout << "inside readkeyword:" << state << '\n';
 
       if (debug) {
+        // https://www.tidyverse.org/blog/2023/03/cran-checks-compiled-code/#warning-regarding-the-use-of-codesprintfcode-in-cc
         std::cout << "c: " << c << " InFnutt: " << InFnutt <<
           " keyword " << keyword <<
           " language: " << language <<

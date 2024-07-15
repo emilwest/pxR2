@@ -21,6 +21,7 @@ If the keyword is of type integer, it will be returned as integer.
 Get value from metadata tibble by keyword
 }
 \examples{
+\dontrun{
 get_value_by_keyword(meta_example, "STUB")
 get_value_by_keyword(metadata_example_multilingual, "STUB")
 get_value_by_keyword(metadata_example_multilingual, "STUB", main_lang = TRUE)
@@ -28,3 +29,5 @@ get_value_by_keyword(metadata_example_multilingual, "TIMEVAL")
 get_value_by_keyword(metadata_example_multilingual, "TIMEVAL", main_lang = TRUE)
 get_value_by_keyword(metadata_example_multilingual, "DECIMALS")
 }
+}
+\keyword{internal}
