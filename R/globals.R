@@ -1,0 +1,24 @@
+utils::globalVariables(
+  c(
+    "Keyword",
+    "Language_dependent",
+    "Mandatory",
+    "Multiline",
+    "Multivalue",
+    "Quoted",
+    "Type",
+    "and",
+    "keyword",
+    "keyword_parsed",
+    "language",
+    "pxvalue",
+    "s",
+    "specs",
+    "valname",
+    "value",
+    "value_parsed",
+    "value_parsed_tmp",
+    "varname"
+  )
+)
+
