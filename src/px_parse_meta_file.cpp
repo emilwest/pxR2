@@ -13,7 +13,7 @@ void hej() {
   if (const char* loc = std::setlocale(LC_ALL, "sv_SE.UTF-8"))
     std::wprintf(L"New LC_ALL locale: %s\n", loc);
 
-  std::cout << "The default locale is " << std::locale().name() << '\n'
+  Rcpp::Rcout << "The default locale is " << std::locale().name() << '\n'
             << "The user's locale is " << std::locale("").name() << '\n';
 }
 
@@ -62,7 +62,7 @@ std::vector<std::string> px_extract_meta_strings(const std::string& infilename, 
 
   while (std::getline(infile, line)) {
     if (line.compare("DATA=") == 0) {
-      //std::cout << "found data\n";
+      //Rcpp::Rcout << "found data\n";
       break;
     }
 
@@ -83,7 +83,7 @@ std::vector<std::string> px_extract_meta_strings(const std::string& infilename, 
       }
       sb += line;
 
-      //std::cout << line << '\n';
+      //Rcpp::Rcout << line << '\n';
     }
     else {
       sb += line;
@@ -95,7 +95,7 @@ std::vector<std::string> px_extract_meta_strings(const std::string& infilename, 
   }
 
   if (debug) {
-    std::cout << linenr;
+    Rcpp::Rcout << linenr;
   }
   infile.close();
   return res;
@@ -112,7 +112,7 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
 
   for(unsigned int i = 0; i < meta_strings.size(); i++) {
     if (debug) {
-      std::cout << "line: " << i;
+      Rcpp::Rcout << "line: " << i;
     }
     std::string s = meta_strings[i];
 
@@ -127,7 +127,7 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
       reslist.push_back(df);
     }
     catch (const std::runtime_error &ex) {
-      std::cerr << " (an error occured at line): " << i;
+      Rcpp::Rcerr << " (an error occured at line): " << i;
       throw ex;
     }
   }

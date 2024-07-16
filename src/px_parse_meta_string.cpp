@@ -64,7 +64,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
   std::string sb; // where we save characters to
   std::string errorhelp; // error help string in the value parser
 
-  //std::cout << line.size();
+  //Rcpp::Rcout << line.size();
 
   // cf https://stackoverflow.com/questions/48545330/c-fastest-way-to-read-file-line-by-line
   //std::ifstream infile(infilename);
@@ -84,11 +84,11 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
     switch (state) {
 
     case ParserState::ReadKeyword:
-      //std::cout << "inside readkeyword:" << state << '\n';
+      //Rcout << "inside readkeyword:" << state << '\n';
 
       if (debug) {
         // https://www.tidyverse.org/blog/2023/03/cran-checks-compiled-code/#warning-regarding-the-use-of-codesprintfcode-in-cc
-        std::cout << "c: " << c << " InFnutt: " << InFnutt <<
+        Rcpp::Rcout << "c: " << c << " InFnutt: " << InFnutt <<
           " keyword " << keyword <<
           " language: " << language <<
             " subkeys.size(): " << subkeys.size() <<
@@ -157,7 +157,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
     case ParserState::ReadLanguage:
 
       if (debug) {
-        std::cout << "c: " << c << " InFnutt: " << InFnutt <<
+        Rcpp::Rcout << "c: " << c << " InFnutt: " << InFnutt <<
           " language: " << language <<
             " state: " << state <<
               '\n';
@@ -187,7 +187,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
     case ParserState::ReadSubkeys:
 
       if (debug) {
-        std::cout << "c: " << c << " InFnutt: " << InFnutt <<
+        Rcpp::Rcout << "c: " << c << " InFnutt: " << InFnutt <<
           " subkeys.empty(): " << subkeys.empty() <<
             " state: " << state <<
             '\n';
@@ -206,7 +206,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
         else {
           // comma means a new subkeys comes after, so add and clear sb for parsing next subkeys
           if (debug) {
-            std::cout << "added: " << sb << " to subkey"
+            Rcpp::Rcout << "added: " << sb << " to subkey"
                       << '\n';
           }
           subkeys.push_back(sb);
@@ -226,7 +226,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
           //if (sb[sb.length()] != ',') {
           if (sb.length() > 0) {
             if (debug) {
-              std::cout << "added: " << sb << " to subkey, all subkeys read."
+              Rcpp::Rcout << "added: " << sb << " to subkey, all subkeys read."
                         << '\n';
             }
 
@@ -234,7 +234,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
             sb.clear();
           } else {
             if (debug) {
-              std::cout << "did not add: " << sb <<
+              Rcpp::Rcout << "did not add: " << sb <<
                 " to subkey, since sb is empty. Probably the last character was a , before END_SUBKEY." <<
                   " Only subkeys within quotes will be added." << '\n';
             }
@@ -257,7 +257,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
     case ParserState::ReadValues:
 
       if (debug) {
-        std::cout << "c: " << c << " InFnutt: " << InFnutt <<
+        Rcpp::Rcout << "c: " << c << " InFnutt: " << InFnutt <<
           " valueType: " << valueType <<
             " values.empty(): " << values.empty() <<
             '\n';
@@ -268,7 +268,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
       if (!values.empty() && valueType == ValueType::ErrorValue) {
         // There are errors in values -> Read to ; and send error
         if (debug) {
-          std::cout << "ErrorValue detected: ";
+          Rcpp::Rcout << "ErrorValue detected: ";
         }
 
         if (c == END_VALUES) {
@@ -297,7 +297,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
           case ValueType::NotSet:
             valueType = ValueType::FnuttValue;
             if (debug) {
-              std::cout << "<Set valueType to FnuttValue (1) due to InFnutt true (1)>\n";
+              Rcpp::Rcout << "<Set valueType to FnuttValue (1) due to InFnutt true (1)>\n";
             }
 
             if (c != FNUTT) {
@@ -324,7 +324,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
           case ValueType::NoFnuttValue:
             valueType = ValueType::ErrorValue;
             if (debug) {
-              std::cout << "<Set valueType to ErrorValue (3) due to InFnutt true (1) despite current ValueType::NoFnuttValue>\n";
+              Rcpp::Rcout << "<Set valueType to ErrorValue (3) due to InFnutt true (1) despite current ValueType::NoFnuttValue>\n";
             }
             errorhelp = "The parser encountered an error because the current state "
             "says it is inside an open quote \" despite the valuetype indicating it isn't. \n"
@@ -352,7 +352,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
             // to handle this
             valueType = ValueType::NotSet;
             if (debug) {
-              std::cout << "<Resetted valuetype to NotSet (0) due to COMMA>\n";
+              Rcpp::Rcout << "<Resetted valuetype to NotSet (0) due to COMMA>\n";
             }
             break;
           case COLON:
@@ -373,7 +373,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
             else {
               valueType = ValueType::ErrorValue;
               if (debug) {
-                std::cout << "<Set valueType to ErrorValue (3) due to MINUS character in value and not being TIMEVAL>\n";
+                Rcpp::Rcout << "<Set valueType to ErrorValue (3) due to MINUS character in value and not being TIMEVAL>\n";
               }
               errorhelp = "The parser encountered an error because the current state "
               "says it detected a MINUS ('-') between two values, which is not allowed unless the keyword is a TIMEVAL. \n"
@@ -401,7 +401,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
             else {
               valueType = ValueType::ErrorValue;
               if (debug) {
-                std::cout << "<Set valueType to ErrorValue (3) due to detected END_SUBKEY despite keyword not being TIMEVAL>\n";
+                Rcpp::Rcout << "<Set valueType to ErrorValue (3) due to detected END_SUBKEY despite keyword not being TIMEVAL>\n";
               }
               errorhelp = "The parser encountered an error because the current state "
               "says it detected an END_SUBKEY (')') between two values, which is not allowed unless the keyword is a TIMEVAL \n."
@@ -421,7 +421,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
             case ValueType::NotSet:
               valueType = ValueType::NoFnuttValue;
               if (debug) {
-                std::cout << "<Set valuetype to NoFnuttValue (2) due to no FNUTT detected>\n";
+                Rcpp::Rcout << "<Set valuetype to NoFnuttValue (2) due to no FNUTT detected>\n";
               }
               if (values.empty()) {
                 sb += c;
@@ -435,7 +435,7 @@ Rcpp::List px_parse_meta_string(const std::string& line, bool debug=false) {
             case ValueType::FnuttValue:
               valueType = ValueType::ErrorValue;
               if (debug) {
-                std::cout << "<Set valueType to ErrorValue (3) due to ValueType::FnuttValue (1) despite InFnutt false (0)>\n";
+                Rcpp::Rcout << "<Set valueType to ErrorValue (3) due to ValueType::FnuttValue (1) despite InFnutt false (0)>\n";
               }
               errorhelp = "The parser encountered an error because the current state "
               "says it is not inside quotes \", but the valuetype says it is. \n."
