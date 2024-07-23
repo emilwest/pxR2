@@ -95,6 +95,7 @@ get_varnames <- function(.metadata_df) {
 
 px_meta_compare_varnames <- function(.metadata_df_new, .metadata_df) {
   varnames_in_meta <- .metadata_df %>% get_varnames()
+  if (all(is.na(varnames_in_meta))) stop("No varnames found in metadata, please add them to STUB or HEADING")
   varnames_found <- .metadata_df_new %>%
     dplyr::select(varname) %>%
     drop_na() %>%
