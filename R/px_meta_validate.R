@@ -1,4 +1,13 @@
 
+is_mandatory <- function(keyword) {
+  mandatory_vars <- specs %>%
+    dplyr::filter(Mandatory == TRUE) %>%
+    dplyr::filter(Keyword != "DATA") %>%
+    dplyr::pull(Keyword)
+
+  keyword %in% mandatory_vars
+}
+
 
 px_meta_check_mandatory <- function(.metadata_df, exclude = NULL) {
   mandatory_vars <- specs %>%

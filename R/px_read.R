@@ -1,5 +1,88 @@
 
+# helper
+px_get_variables <- function(.meta_df) {
+  stub <- get_value_by_keyword(px$metadata$metadata, "STUB")
+  heading <- get_value_by_keyword(px$metadata$metadata, "HEADING")
+  x <- c(stub, heading)
+  x[!is.na(x)]
+}
 
+
+
+px_add_values_from_data <- function(.metadata_df, .data) {
+  vals_to_add <- px_get_values_from_data(.data)
+  px_meta_compare_varnames(.metadata_df_new = vals_to_add, .metadata_df = .metadata_df)
+
+  .metadata_df %>%
+    dplyr::rows_insert(vals_to_add, by = c("keyword","language", "varname", "valname"))
+}
+
+# px_add_values_from_data(new_meta, ex_data)
+
+
+is_expected_number_of_levels <- function(.data, silent = TRUE) {
+  special_cols <- c("value", "pxvalue")
+  expected_lengths <- .data |>
+    dplyr::select(-any_of(special_cols)) |>
+    dplyr::mutate(dplyr::across(dplyr::everything(), ~ as.character(.x) |> as.factor())) |>
+    purrr::map(levels) |>
+    purrr::map(length) |>
+    base::unlist()
+
+  n_expected <- prod(expected_lengths)
+  actual <- nrow(.data)
+
+  detaljer <- expected_lengths |>
+    tibble::enframe() |>
+    stringr::str_glue_data("({name} = {value})") |>
+    stringr::str_c(collapse = " \u00d7 ") |>
+    stringr::str_c(" = ", n_expected)
+
+  if (n_expected != actual) {
+    if (!silent) {
+      warning(stringr::str_glue("Number of rows does not match expected number based on the combination of all factor levels.
+                  Expected: {n_expected} [{detaljer}]
+                  Actual: {actual}
+                  "))
+    }
+    return(FALSE)
+  } else {
+    if (!silent) {
+      print(stringr::str_glue("Success. Number of rows matches expected number based on the combination of all factor levels.
+                  Expected: {n_expected} [{detaljer}]
+                  Actual: {actual}
+                  "))
+    }
+    return(TRUE)
+  }
+}
+
+complete_missing_levels_in_data <- function(.data) {
+  special_cols <- c("value", "pxvalue")
+
+  not_value <- setdiff(colnames(.data), special_cols)
+
+  ej_faktorer <- purrr::map(.data, is.factor) |> purrr::keep(~ .x == FALSE) |> names()
+  ej_faktorer <- setdiff(ej_faktorer, special_cols)
+
+  if (length(ej_faktorer) > 0) {
+    .data <- .data |>
+      dplyr::mutate(dplyr::across(all_of(ej_faktorer), factor))
+  }
+
+  res <- .data |>
+    tidyr::complete(!!!dplyr::syms(not_value)) |>
+    dplyr::group_by(dplyr::across(-value)) |>
+    # sum repeating categories
+    dplyr::summarise(value = sum(value, na.rm = TRUE)) |>
+    dplyr::ungroup()
+
+  if (!is_expected_number_of_levels(res, silent = F)) {
+    warning("Completing missing levels in data failed, double check the data and complete manually")
+  }
+
+  return(res)
+}
 
 
 # todo: add encoding detection in c++
@@ -16,8 +99,16 @@ px_extract_meta_from_file <- function(file) {
 init_empty_px_object <- function() {
   metadata <- list(
     metadata = px_meta_init_empty(),
-    variable_codes = tibble::tibble(),
-    value_codes = tibble::tibble()
+    variable_codes = dplyr::tibble(variablecode=character(),
+                                   language=character(),
+                                   variabletype=character(),
+                                   variable=character()
+                                   ),
+    value_codes = dplyr::tibble(variablecode=character(),
+                                language=character(),
+                                value=character(),
+                                code=character()
+    )
   )
 
   px_obj <- list(metadata = metadata, data = tibble::tibble())
@@ -46,8 +137,16 @@ init_mandatory_vars <- function() {
 
 # .data <- ex_data
 
-pxR2::meta_example
-
+#' Create px object from data frame
+#'
+#' @param .data data frame or tibble
+#'
+#' @return returns a px object of class pxR2, ie a list of dataframes containing metadata and data
+#'
+#' @examples
+#' create_px_object_from_dataframe(ex_data)
+#'
+#' @keywords internal
 create_px_object_from_dataframe <- function(.data) {
   assertthat::assert_that(is.data.frame(.data))
   assertthat::assert_that(any(names(.data) %in% "value"))
@@ -74,7 +173,16 @@ create_px_object_from_dataframe <- function(.data) {
     stop("At least one variable is needed for STUB or HEADING.")
   }
 
-  px$metadata$metadata <- px_add_values_from_data(.data = .data, .metadata_df = px$metadata$metadata)
+
+
+  # add values from data
+  vals_to_add <- px_get_values_from_data(.data)
+  px_meta_compare_varnames(.metadata_df_new = vals_to_add, .metadata_df =  px$metadata$metadata)
+
+  px$metadata$metadata <- px$metadata$metadata |>
+    dplyr::rows_insert(vals_to_add, by = c("keyword","language", "varname", "valname"))
+
+  #px$metadata$metadata <- pxR2::px_add_values_from_data(.metadata_df = px$metadata$metadata, .data = .data)
 
   # add other default keywords
   px$metadata$metadata <- px$metadata$metadata |>
@@ -88,18 +196,53 @@ create_px_object_from_dataframe <- function(.data) {
     sort_metadata_keywords()
 
 
+  # variable codes are constructed from available variables in stub/heading.
+  # when creating from a dataframe the first time,
+  # the variablecode and and variable label are the same.
+  px$metadata$variable_codes <- px$metadata$variable_codes |>
+    dplyr::bind_rows(
+      available_colnames |>
+        tibble::enframe(value = "variablecode", name="language") |>
+        dplyr::mutate(dplyr::across(dplyr::everything(), as.character),
+                      language=NA,
+                      variable=variablecode)
 
+    )
+
+  # generate value codes, by default codes = values.
+  px$metadata$value_codes <- px$metadata$value_codes |>
+    dplyr::bind_rows(
+      px$data |>
+        dplyr::select(dplyr::all_of(available_colnames)) |>
+        purrr::map_if(.p = is.factor, .f = levels, .else = unique) |>
+        purrr::map(as.character) |>
+        tibble::enframe(name = "variablecode", value = "value") |>
+        tidyr::unnest(value) |>
+        mutate(code = value)
+    )
+
+  # compare all values in value_codes to number of rows in data.
+  # since the px data is a cube with all combinations of variable-values,
+  # the number of rows in data must match the product of all variable values.
+  if (!is_expected_number_of_levels(px$data)) {
+    print(stringr::str_glue("Detected missing levels in data, completing missing levels."))
+    px$data <- complete_missing_levels_in_data(px$data)
+  }
   px
 }
 
-create_px_object_from_dataframe(ex_data)
 
-dplyr::storms |>
-  select(name, year, status) |>
-  distinct() |>
-  count(status, year, name = "value") |>
-  arrange(year, status) |>
-  create_px_object_from_dataframe()
+
+
+# create_px_object_from_dataframe(ex_data)
+#
+# px <- dplyr::storms |>
+#   select(name, year, status) |>
+#   distinct() |>
+#   count(status, year, name = "value") |>
+#   arrange(year, status) |>
+#   create_px_object_from_dataframe()
+
 
 
 
@@ -134,17 +277,23 @@ create_px_object_from_px_file <- function(file,
 }
 
 
+#' Create px object from dataframe or px file
+#'
+#' @param input either a datarframe/tibble or a path to a px file ending in `.px` or `.PX`
+#'
+#' @return returns a px object of class pxR2
+#' @export
+#'
 px_read <- function(input) {
 
   if (is.data.frame(input)) {
-    create_px_object_from_dataframe()
+    create_px_object_from_dataframe(input)
   } else if (is_px_file(input)) {
     # create_px_object_from_px_file(input) #todo
   } else {
     stop("Please provide input as either a dataframe/tibble or a path to a px-file ending in .px or .PX")
   }
 
-  structure(px_obj, class = "pxR2")
 }
 
 #

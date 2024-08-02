@@ -84,11 +84,11 @@ px_meta_add_keyword <- function(
   }
 
   tryCatch(
-    metadata %>%
-      dplyr::rows_insert(to_add, by = c("keyword","language", "varname", "valname"))
+    metadata |>
+      dplyr::rows_insert(to_add, by = c("keyword","language", "varname", "valname"),)
     ,
     error=function(e) {
-      message('metadata already exist')
+      message('The keyword-value combination already exist in metadata')
       print(e)
     }
   )
@@ -96,6 +96,19 @@ px_meta_add_keyword <- function(
 }
 
 
+px_meta_update_value <- function(metadata,
+               target_column = c("keyword","language", "varname", "valname"),
+               target_value,
+               new_value) {
+  match.arg(target_column)
+
+  metadata |>
+    mutate(value = ifelse(!!sym(target_column) == target_value,
+                          new_value,
+                          value
+    ))
+
+}
 
 
 #' Add time value information to px metadata tibble

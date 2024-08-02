@@ -98,17 +98,6 @@ px_get_values_from_data <- function(.data, as_list = FALSE) {
 
 
 
-px_add_values_from_data <- function(.metadata_df, .data) {
-  vals_to_add <- px_get_values_from_data(.data)
-  px_meta_compare_varnames(.metadata_df_new = vals_to_add, .metadata_df = .metadata_df)
-
-  .metadata_df %>%
-    rows_insert(vals_to_add, by = c("keyword","language", "varname", "valname"))
-}
-
-# px_add_values_from_data(new_meta, ex_data)
-
-
 
 get_special_colnames <- function() {
   c("value", "pxvalue")

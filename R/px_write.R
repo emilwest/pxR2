@@ -1,4 +1,14 @@
 
+#
+# .px_object <- pxR2::px_read(ex_data)
+# .px_object$metadata$metadata <-
+#   px_meta_update_value(.px_object$metadata$metadata , "keyword", "MATRIX", "TEST01") |>
+#   px_meta_update_value("keyword", "SUBJECT-CODE", "A") |>
+#   px_meta_update_value("keyword", "SUBJECT-AREA", "AA") |>
+#   px_meta_update_value("keyword", "TITLE", "Hej") |>
+#   px_meta_update_value("keyword", "CONTENTS", "Hej") |>
+#   px_meta_update_value("keyword", "UNITS", "Number")
+
 
 #' Write px object to a PX file
 #'
@@ -29,19 +39,19 @@
 
 px_write <- function(.px_object, file) {
   data <- .px_object$data
-  meta <- .px_object$metadata
+  meta_full <- .px_object$metadata
+  meta <- meta_full$metadata
   # format data according to stub and heading
   data <- convert_data_to_final(meta, data)
 
-  main_lang <- meta |> get_value_by_keyword("LANGUAGE")
+
+  main_lang <- px_get_main_language(meta)
   x <- meta |> get_value_by_keyword("STUB")
   if (length(x) > 1) {
     stubvec <- x[main_lang] |> split_commas()
   } else {
     stubvec <- x[1] |> split_commas()
   }
-
-
 
   # extract numbers from df only
   m <- data |>
@@ -54,7 +64,7 @@ px_write <- function(.px_object, file) {
   datalines <- apply(format(m), 1, paste, collapse=" ")
 
   # metadata part
-  meta_lines <- pull(px_parse_metadata(meta), s)
+  meta_lines <- px_parse_metadata(meta_full)
 
   # construct px file
   px <- c(meta_lines, "DATA=", datalines, ";")
@@ -62,8 +72,5 @@ px_write <- function(.px_object, file) {
 }
 
 
-# px_write(px_obj, file = "test2.px")
-
-
-
+# px_write(.px_object, file = "test2.px")
 
