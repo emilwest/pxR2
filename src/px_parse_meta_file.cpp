@@ -1,4 +1,3 @@
-// [[Rcpp::depends(BH)]]
 
 #include <Rcpp.h>
 #include <fstream>
@@ -8,7 +7,7 @@
 using namespace Rcpp;
 
 
-// [[Rcpp::export]]
+
 void hej() {
   if (const char* loc = std::setlocale(LC_ALL, "sv_SE.UTF-8"))
     std::wprintf(L"New LC_ALL locale: %s\n", loc);
@@ -143,7 +142,6 @@ Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug=false) {
 x <- px_parse_meta_file("inst/extdata/WORK02.px")
 
 
-hej()
 #px_extract_meta_strings("inst/extdata/WORK02.px")
 
 
