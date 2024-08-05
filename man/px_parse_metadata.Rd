@@ -2,12 +2,12 @@
 % Please edit documentation in R/px_parse_metadata.R
 \name{px_parse_metadata}
 \alias{px_parse_metadata}
-\title{Parse px metadata tibble to px-formatted text.}
+\title{Parse px metadata to px-formatted text.}
 \usage{
-px_parse_metadata(.metadata_df, full_dataframe = FALSE)
+px_parse_metadata(.metadata, full_dataframe = FALSE)
 }
 \arguments{
-\item{.metadata_df}{Metadata tibble as input to be converted to px-formatted text.}
+\item{.metadata}{Metadata as input to be converted to px-formatted text.}
 
 \item{full_dataframe}{If TRUE, return entire dataframe. Useful for debugging. Default FALSE.}
 }
@@ -15,6 +15,6 @@ px_parse_metadata(.metadata_df, full_dataframe = FALSE)
 Px-formatted text
 }
 \description{
-Parse px metadata tibble to px-formatted text.
+Parse px metadata to px-formatted text.
 }
 \keyword{internal}

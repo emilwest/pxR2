@@ -41,6 +41,25 @@ splitlist <- function(txt) {
 }
 
 
+# the reverse of splitlist
+# "\"location\",\"temperature\""  -> c("location","temperature")
+unsplitlist <- function(txt) {
+  txt[is.na(txt)] <- NA_character_
+  assertthat::assert_that(is.character(txt), msg = "Input must be a character vector")
+  assertthat::assert_that(length(txt)>0, msg = "Length of charcter vector must be at least one")
+
+
+    if (!is.na(txt)) {
+      x <- stringr::str_split_1(txt, "\"")
+      x <- x[stringr::str_length(x)>0]
+      x <- x[x!=","]
+      x
+    } else {
+      return(NA_character_)
+    }
+}
+#unsplitlist(c("\"location\",\"temperature\"", "\"location\",\"temperature\""))
+
 # .metadata <- .px_object$metadata
 
 #' Parse px metadata to px-formatted text.

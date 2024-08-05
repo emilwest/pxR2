@@ -107,11 +107,21 @@ std::vector<std::string> preprocess_file(const std::string& filePath, bool only_
 
 
 // 1) read entire file once into std::vector<std::string> to avoid re-opening filestream using preprocess_file()
-// 3) parse metadata lines using px_parse_meta_string()
-// 4) parse data lines into vector and re-create into a dataframe later
-// 5) return result as a list of parsed metadata and data
+// 2) parse metadata lines using px_parse_meta_string()
+// 3) parse data lines into vector and re-create into a dataframe later
+// currently support matrix/cube data
+// 4) return result as a list of parsed metadata and data
 
-
+//' Parse a px file
+//'
+//' This function read a px file, parsing data and metadata and warnins if
+//' the PX file is malformatted.
+//'
+//' @param filePath path to PX file ending in .px or .PX
+//' @param only_meta Boolean, set to true if you only want to extract the metadata.
+//' @param debug Boolean, set to true if you want to debug the parser step-by-step.
+//' @return Returns a list of metadata and data.
+//' @export
 // [[Rcpp::export]]
 List px_parse(const std::string& filePath, bool only_meta=false, bool debug=false) {
 
@@ -121,6 +131,12 @@ List px_parse(const std::string& filePath, bool only_meta=false, bool debug=fals
   std::vector<std::string> datavec;
   int parsedValues = 0;
 
+  // std::vector<std::string> keywords;
+  // std::vector<std::string> languages;
+  // std::vector<std::string> subkeys;
+  // std::vector<std::string> values;
+
+
   for(unsigned int i = 0; i < lines.size(); i++) {
     if (debug) {
       Rcpp::Rcout << "Processing line: " << i << "\n";
@@ -129,13 +145,18 @@ List px_parse(const std::string& filePath, bool only_meta=false, bool debug=fals
 
     if (s == "DATA=") {
       if (only_meta) break;
-      Rcpp::Rcout << "In data \n";
+      if (debug) Rcpp::Rcout << "In data \n";
       in_data=true;
       continue;
     }
 
     if (!in_data) {
       List x = px_parse_meta_string(s, debug);
+
+      // keywords.push_back(x["keyword"]);
+      // languages.push_back(x["language"]);
+      // subkeys.push_back(x["subkeys"]);
+      // values.push_back(x["values"]);
 
       DataFrame df = DataFrame::create(Named("keyword")=x["keyword"],
                                        Named("language")=x["language"],
@@ -156,6 +177,12 @@ List px_parse(const std::string& filePath, bool only_meta=false, bool debug=fals
     }
   }
 
+  // DataFrame df = DataFrame::create(Named("keyword", keywords),
+  //                                  Named("language", languages),
+  //                                  Named("subkeys", subkeys),
+  //                                  Named("values", values)
+  // );
+
   if (debug) Rcpp::Rcout << "Parsed values: " << parsedValues << "\n";
 
   return List::create(
@@ -169,7 +196,18 @@ List px_parse(const std::string& filePath, bool only_meta=false, bool debug=fals
 
 
 /*** R
-# x <- preprocess_file("inst\\extdata\\TEMP02.px")
+x <- preprocess_file("inst\\extdata\\TEMP02.px", only_meta = T)
+
+iconv(x, from = "iso-8859-1",to = "UTF-8")
+
 x <- px_parse("inst\\extdata\\TEMP02.px")
-x$meta |> dplyr::bind_rows() |> tibble::as_tibble() |> View()
+# x$meta |> dplyr::bind_rows() |> tibble::as_tibble() |> View()
+x <- px_parse("inst/extdata/WORK02.px")
+
+
+#px_extract_meta_strings("inst/extdata/WORK02.px")
+
+
+#x <- px_parse("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\CHIL03.px")
+#x <- px_parse("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\scb.px")
 */

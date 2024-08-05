@@ -16,7 +16,7 @@ returns a px object of class pxR2, ie a list of dataframes containing metadata a
 Create px object from data frame
 }
 \examples{
-create_px_object_from_dataframe(ex_data)
+pxR2::create_px_object_from_dataframe(ex_data)
 
 }
 \keyword{internal}

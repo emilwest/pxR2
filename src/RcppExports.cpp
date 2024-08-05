@@ -10,36 +10,28 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// hej
-void hej();
-RcppExport SEXP _pxR2_hej() {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    hej();
-    return R_NilValue;
-END_RCPP
-}
-// px_extract_meta_strings
-std::vector<std::string> px_extract_meta_strings(const std::string& infilename, bool debug);
-RcppExport SEXP _pxR2_px_extract_meta_strings(SEXP infilenameSEXP, SEXP debugSEXP) {
+// preprocess_file
+std::vector<std::string> preprocess_file(const std::string& filePath, bool only_meta);
+RcppExport SEXP _pxR2_preprocess_file(SEXP filePathSEXP, SEXP only_metaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type infilename(infilenameSEXP);
-    Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
-    rcpp_result_gen = Rcpp::wrap(px_extract_meta_strings(infilename, debug));
+    Rcpp::traits::input_parameter< const std::string& >::type filePath(filePathSEXP);
+    Rcpp::traits::input_parameter< bool >::type only_meta(only_metaSEXP);
+    rcpp_result_gen = Rcpp::wrap(preprocess_file(filePath, only_meta));
     return rcpp_result_gen;
 END_RCPP
 }
-// px_parse_meta_file
-Rcpp::List px_parse_meta_file(const std::string& infilename, bool debug);
-RcppExport SEXP _pxR2_px_parse_meta_file(SEXP infilenameSEXP, SEXP debugSEXP) {
+// px_parse
+List px_parse(const std::string& filePath, bool only_meta, bool debug);
+RcppExport SEXP _pxR2_px_parse(SEXP filePathSEXP, SEXP only_metaSEXP, SEXP debugSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type infilename(infilenameSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type filePath(filePathSEXP);
+    Rcpp::traits::input_parameter< bool >::type only_meta(only_metaSEXP);
     Rcpp::traits::input_parameter< bool >::type debug(debugSEXP);
-    rcpp_result_gen = Rcpp::wrap(px_parse_meta_file(infilename, debug));
+    rcpp_result_gen = Rcpp::wrap(px_parse(filePath, only_meta, debug));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -57,9 +49,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_pxR2_hej", (DL_FUNC) &_pxR2_hej, 0},
-    {"_pxR2_px_extract_meta_strings", (DL_FUNC) &_pxR2_px_extract_meta_strings, 2},
-    {"_pxR2_px_parse_meta_file", (DL_FUNC) &_pxR2_px_parse_meta_file, 2},
+    {"_pxR2_preprocess_file", (DL_FUNC) &_pxR2_preprocess_file, 2},
+    {"_pxR2_px_parse", (DL_FUNC) &_pxR2_px_parse, 3},
     {"_pxR2_px_parse_meta_string", (DL_FUNC) &_pxR2_px_parse_meta_string, 2},
     {NULL, NULL, 0}
 };

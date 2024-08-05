@@ -144,7 +144,7 @@ init_mandatory_vars <- function() {
 #' @return returns a px object of class pxR2, ie a list of dataframes containing metadata and data
 #'
 #' @examples
-#' create_px_object_from_dataframe(ex_data)
+#' pxR2::create_px_object_from_dataframe(ex_data)
 #'
 #' @keywords internal
 create_px_object_from_dataframe <- function(.data) {
@@ -252,7 +252,10 @@ is_px_file <- function(input) {
 }
 
 create_px_object_from_px_file <- function(file,
-                                          encoding="guess") {
+                                          encoding="guess",
+                                          only_meta=FALSE,
+                                          debug=FALSE
+                                          ) {
 
 
   if (encoding == "guess") {
@@ -263,18 +266,73 @@ create_px_object_from_px_file <- function(file,
     print(paste("Encoding:", encoding))
   }
 
-  meta <- px_extract_meta_from_file(file)
 
- #  y <- readr::read_file(file = file, locale = readr::locale(encoding = encoding))
- #  y1 <- stringr::str_split_1(y, "DATA=\\r\\n")
- #  meta <- y1[1] # metadata-part
- #
- #
- # # mat <- y1[2] # matrix/data-part
+  px <- px_parse(file, only_meta, debug)
+  meta <- px$meta |>
+    dplyr::bind_rows() |>
+    tibble::as_tibble() |>
+    dplyr::mutate(dplyr::across(dplyr::everything(),
+                                \(x) iconv(x, from = encoding, to = "UTF-8"))) |>
+    # convert to list-vectors
+    dplyr::mutate(subkeys = map(subkeys, unsplitlist),
+           values = map(values, unsplitlist)
+    ) |>
+    tidyr::unnest_wider(subkeys, names_sep = "_")
 
-  return(meta)
+  # todo om subkeys fortsätter utöver 2 måste detta fixas
+  names(meta) <- c("keyword", "language", "varname", "valname", "value")
 
+  tval <- get_value_by_keyword(xx, "TIMEVAL")[[1]]
+
+  # extrahera ut timeval till subkey
+  # todo fixa detta i metaparsern?
+  if (length(tval) > 1) {
+    tval_get <- get_value_by_keyword(meta, "TIMEVAL")[[1]]
+    tval <- tval_get[1] |>
+      # (?<=\\(): Asserts that the match must be preceded by an opening parenthesis (.
+      # .+?: Matches any character (except a newline) one or more times, but as few times as possible (non-greedy).
+      # (?=\\)): Asserts that the match must be followed by a closing parenthesis ).
+      str_extract("(?<=\\().+?(?=\\))")
+
+
+    meta[meta$keyword=="TIMEVAL", ]$valname <- tval
+    meta[meta$keyword=="TIMEVAL", ]$value[[1]] <- tval_get[-1]
+  }
+
+
+
+
+  datavec <- px$datavec
+
+  return(list(
+    meta=meta,
+    datavec=datavec
+  ))
 }
+
+xx <- create_px_object_from_px_file("inst/extdata/TEMP02.px")$meta
+get_value_by_keyword(xx, "TIMEVAL")[[1]][-1]
+init_empty_px_object()$metadata$value_codes
+
+# variablecode <chr>, language <chr>, value <chr>, code <chr>
+value_codes <- xx |>
+  dplyr::filter(keyword %in% c("CODES", "VALUES"))
+
+vals <- value_codes |>
+  filter(keyword=="VALUES") |>
+  select(varname, value) |>
+  tidyr::unnest(value) |>
+  distinct()
+
+codes <- value_codes |>
+  filter(keyword=="CODES") |>
+  select(varname, value) |>
+  tidyr::unnest(value) |>
+  distinct()
+
+# TODO fortsätt
+bind_cols(vals,codes)
+
 
 
 #' Create px object from dataframe or px file

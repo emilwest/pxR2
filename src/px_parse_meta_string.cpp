@@ -478,9 +478,7 @@ px_parse_meta_string("CELLNOTE[sv](kön, *, *, ålder,)=\"Data not applicable\";
 px_parse_meta_string("CHARSET=\"ANSI\";")
 px_parse_meta_string("CHARSET[en]=\"ANSI\";")
 
-# detta ska returnera DATA så att parsern vet när den ska stanna i loopen sen
 px_parse_meta_string("DATA=")
-
 
 px_parse_meta_string("VALUENOTE[sv](\"Norway\")=\"Break in time series\";")
 px_parse_meta_string("VALUENOTE[sv](\"Norway\",\"Oslo\")=\"Break in time series\";", T)
