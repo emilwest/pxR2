@@ -282,7 +282,7 @@ create_px_object_from_px_file <- function(file,
   # todo om subkeys fortsätter utöver 2 måste detta fixas
   names(meta) <- c("keyword", "language", "varname", "valname", "value")
 
-  tval <- get_value_by_keyword(xx, "TIMEVAL")[[1]]
+  tval <- get_value_by_keyword(meta, "TIMEVAL")[[1]]
 
   # extrahera ut timeval till subkey
   # todo fixa detta i metaparsern?
@@ -300,38 +300,109 @@ create_px_object_from_px_file <- function(file,
   }
 
 
+  # ----------------------------------------------------------------------------
+  # VARIABLE CODES
+  variable_codes <- meta |>
+    dplyr::filter(keyword == "VARIABLECODE")
+
+  if (nrow(variable_codes) > 0) {
+    variable_codes <- variable_codes |>
+      dplyr::select(variablecode = value, language=language, variable=varname) |>
+      tidyr::unnest(variablecode) |>
+      dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+  } else {
+    # TODO fixa multilingual
+    varnames <- c(get_value_by_keyword(xx, "STUB"), get_value_by_keyword(xx, "HEADING")) |>
+      unlist()
+
+    # if variablecode does not exist, it gets the same value as the variable label
+    variable_codes <- tibble::enframe(varnames) |>
+      mdplyr::mutate(variablecode = value, language = NA, variable = variablecode) |>
+      dplyr::select(variablecode, language, variable) |>
+      dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
+
+  }
 
 
-  datavec <- px$datavec
+  # check if variable-type exists
+  variabletype_df <- meta |>
+    filter(keyword == "VARIABLE-TYPE")
+  if (nrow(variabletype_df) > 0) {
+    variabletype_df <- variabletype_df |>
+      tidyr::unnest(value) |>
+      dplyr::select(variable = varname, variabletype = value)
+    variable_codes <- variable_codes |>
+      dplyr::left_join(variabletype_df, by = join_by(variable))
 
-  return(list(
-    meta=meta,
-    datavec=datavec
-  ))
+
+    missing_variabletypes <- variable_codes[is.na(variable_codes$variabletype),]
+    if (nrow(missing_variabletypes) > 0) {
+
+      warningtext <- missing_variabletypes |>
+        stringr::str_glue_data("VARIABLECODE: {variablecode}. Variable label: {variable}.
+                             Consider adding VARIABLE-TYPE(\"{variablecode}\")=\"value\"; where value is one of V, T, C or G.
+                             ")
+      warning(
+        str_glue("Detected missing VARIABLE-TYPE for the following variable:
+             {warningtext}
+             V=value, T=time, C=contents, G=geographical. See official PX documentation for more info.
+             ")
+      )
+
+    }
+  } else {
+    variable_codes <- variable_codes |>
+      dplyr::mutate(variabletype = NA)
+  }
+  variable_codes <- variable_codes |>
+    dplyr::select(variablecode, language, variabletype, variable)
+
+  # ----------------------------------------------------------------------------
+  # VALUE CODES
+
+  value_codes <- meta |>
+    dplyr::filter(keyword %in% c("CODES", "VALUES")) |>
+    tidyr::pivot_wider(names_from=keyword) |>
+    dplyr::left_join(variable_codes, by = join_by(varname == variable, language)) |>
+    dplyr::select(variablecode, language, value=VALUES, code=CODES) |>
+    dplyr::distinct() |>
+    tidyr::unnest(cols = c(code, value)) |>
+    distinct()
+
+
+
+
+  px_obj <- init_empty_px_object()
+  px_obj$metadata$metadata <- meta
+  px_obj$metadata$variable_codes <- variable_codes
+  px_obj$metadata$value_codes <- value_codes
+  px_obj$data <- px$datavec #TODO
+
+
+  return(px_obj)
 }
 
-xx <- create_px_object_from_px_file("inst/extdata/TEMP02.px")$meta
-get_value_by_keyword(xx, "TIMEVAL")[[1]][-1]
+#
+xx <- create_px_object_from_px_file("inst/extdata/TEMP02.px")
+#xx <- create_px_object_from_px_file("inst/extdata/WORK02.px")$meta
+#xx <- create_px_object_from_px_file("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\scb.px")$meta
+
 init_empty_px_object()$metadata$value_codes
+init_empty_px_object()$metadata$variable_codes
 
+
+# variablecode <chr>, language <chr>, variabletype <chr>, variable <chr>
 # variablecode <chr>, language <chr>, value <chr>, code <chr>
-value_codes <- xx |>
-  dplyr::filter(keyword %in% c("CODES", "VALUES"))
+# value_codes <- xx$metadata$metadata |>
+#   dplyr::filter(keyword %in% c("CODES", "VALUES")) |>
+#   tidyr::pivot_wider(names_from=keyword) |>
+#   dplyr::left_join(xx$metadata$variable_codes, by = join_by(varname == variable, language)) |>
+#   dplyr::select(variablecode, language, value=VALUES, code=CODES) |>
+#   dplyr::distinct() |>
+#   tidyr::unnest(cols = c(code, value)) |>
+#   distinct()
 
-vals <- value_codes |>
-  filter(keyword=="VALUES") |>
-  select(varname, value) |>
-  tidyr::unnest(value) |>
-  distinct()
 
-codes <- value_codes |>
-  filter(keyword=="CODES") |>
-  select(varname, value) |>
-  tidyr::unnest(value) |>
-  distinct()
-
-# TODO fortsätt
-bind_cols(vals,codes)
 
 
 
