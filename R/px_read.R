@@ -251,6 +251,7 @@ is_px_file <- function(input) {
   return(tolower(stringr::str_sub(input, start = -2)) == "px")
 }
 
+# file <- "inst/extdata/WORK02.px"
 create_px_object_from_px_file <- function(file,
                                           encoding="guess",
                                           only_meta=FALSE,
@@ -266,44 +267,62 @@ create_px_object_from_px_file <- function(file,
     print(paste("Encoding:", encoding))
   }
 
+  assertthat::assert_that(file.exists(file))
 
   px <- px_parse(file, only_meta, debug)
-  meta <- px$meta |>
-    dplyr::bind_rows() |>
-    tibble::as_tibble() |>
-    dplyr::mutate(dplyr::across(dplyr::everything(),
-                                \(x) iconv(x, from = encoding, to = "UTF-8"))) |>
-    # convert to list-vectors
-    dplyr::mutate(subkeys = map(subkeys, unsplitlist),
-           values = map(values, unsplitlist)
-    ) |>
-    tidyr::unnest_wider(subkeys, names_sep = "_")
+  actual_encoding <- px$values$CODEPAGE
 
-  # todo om subkeys fortsätter utöver 2 måste detta fixas
+  valuelist <- px$values |> map(\(x) iconv(x, from = actual_encoding, to = "UTF-8"))
+  subkeylist <- px$subkeys |> map(\(x) iconv(x, from = actual_encoding, to = "UTF-8"))
+
+  varnames <- c(valuelist$STUB, valuelist$HEADING)
+
+  # extract timeval to subkey
+  if ("TIMEVAL" %in% names(valuelist)) {
+    tval <- valuelist$TIMEVAL
+    tval_type <- str_extract(tval[1], "(?<=\\().+?(?=\\))")
+    valuelist$TIMEVAL <- tval[-1]
+    subkeylist$TIMEVAL <- c(subkeylist$TIMEVAL, tval_type)
+  }
+
+  meta <- dplyr::bind_cols(keyword=px$keyword, language=px$language)
+
+  # all subkeys with more than two elements are multivariate, like cellnotes
+  cell_specific <- subkeylist |> keep(\(x) length(x) > 2)
+  # subkeys with at most 2 subkeys specifies a single variable and a variable value
+  meta_subkeys <- subkeylist |> keep(\(x) length(x) <= 2) |>
+    tibble::enframe(name = "keyword") |>
+    tidyr::unnest_wider(value, names_sep = "_")
+
+  cell_specific_ind <- which(subkeylist %in% cell_specific)
+  meta <- meta[-cell_specific_ind,]
+
+  meta <- dplyr::bind_cols(meta,
+                   dplyr::select(meta_subkeys, -keyword),
+                   dplyr::select(tibble::enframe(valuelist[-cell_specific_ind]), -name)
+                   )
+
   names(meta) <- c("keyword", "language", "varname", "valname", "value")
 
-  tval <- get_value_by_keyword(meta, "TIMEVAL")[[1]]
+  value_codes <- meta |>
+    dplyr::filter(keyword %in% c("CODES", "VALUES"))
 
-  # extrahera ut timeval till subkey
-  # todo fixa detta i metaparsern?
-  if (length(tval) > 1) {
-    tval_get <- get_value_by_keyword(meta, "TIMEVAL")[[1]]
-    tval <- tval_get[1] |>
-      # (?<=\\(): Asserts that the match must be preceded by an opening parenthesis (.
-      # .+?: Matches any character (except a newline) one or more times, but as few times as possible (non-greedy).
-      # (?=\\)): Asserts that the match must be followed by a closing parenthesis ).
-      str_extract("(?<=\\().+?(?=\\))")
+  variable_codes <- meta |>
+    dplyr::filter(keyword == "VARIABLECODE")
 
+  # check if variable-type exists
+  variabletype_df <- meta |>
+    filter(keyword == "VARIABLE-TYPE")
 
-    meta[meta$keyword=="TIMEVAL", ]$valname <- tval
-    meta[meta$keyword=="TIMEVAL", ]$value[[1]] <- tval_get[-1]
-  }
+  meta <- meta |>
+    dplyr::filter(!keyword %in% c("CODES", "VALUES")) |>
+    dplyr::filter(!keyword %in% c("VARIABLECODE")) |>
+    dplyr::filter(!keyword %in% c("VARIABLE-TYPE"))
 
 
   # ----------------------------------------------------------------------------
   # VARIABLE CODES
-  variable_codes <- meta |>
-    dplyr::filter(keyword == "VARIABLECODE")
+
 
   if (nrow(variable_codes) > 0) {
     variable_codes <- variable_codes |>
@@ -312,21 +331,16 @@ create_px_object_from_px_file <- function(file,
       dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
   } else {
     # TODO fixa multilingual
-    varnames <- c(get_value_by_keyword(xx, "STUB"), get_value_by_keyword(xx, "HEADING")) |>
-      unlist()
 
     # if variablecode does not exist, it gets the same value as the variable label
     variable_codes <- tibble::enframe(varnames) |>
-      mdplyr::mutate(variablecode = value, language = NA, variable = variablecode) |>
+      dplyr::mutate(variablecode = value, language = NA, variable = variablecode) |>
       dplyr::select(variablecode, language, variable) |>
       dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   }
 
 
-  # check if variable-type exists
-  variabletype_df <- meta |>
-    filter(keyword == "VARIABLE-TYPE")
   if (nrow(variabletype_df) > 0) {
     variabletype_df <- variabletype_df |>
       tidyr::unnest(value) |>
@@ -355,22 +369,45 @@ create_px_object_from_px_file <- function(file,
       dplyr::mutate(variabletype = NA)
   }
   variable_codes <- variable_codes |>
-    dplyr::select(variablecode, language, variabletype, variable)
+    dplyr::select(variablecode, language, variabletype, variable) |>
+    dplyr::mutate(dplyr::across(dplyr::everything(), as.character))
 
   # ----------------------------------------------------------------------------
   # VALUE CODES
 
-  value_codes <- meta |>
-    dplyr::filter(keyword %in% c("CODES", "VALUES")) |>
+  value_codes_tmp <- value_codes |>
     tidyr::pivot_wider(names_from=keyword) |>
     dplyr::left_join(variable_codes, by = join_by(varname == variable, language)) |>
+    dplyr::mutate(type = dplyr::case_match(varname,
+                                           valuelist$STUB ~ "STUB",
+                                           valuelist$HEADING ~ "HEADING"
+    ),
+    varname = factor(varname, levels = varname, labels = varname)
+    ) |>
+    dplyr::arrange(varname)
+
+  value_codes_final <- value_codes_tmp |>
     dplyr::select(variablecode, language, value=VALUES, code=CODES) |>
     dplyr::distinct() |>
     tidyr::unnest(cols = c(code, value)) |>
     distinct()
 
+  # ----------------------------------------------------------------------------
+  # Re-format data vector
+  # - based on main language
+
+  # TODO
+  x <- value_codes_tmp |>
+    tidyr::unnest(cols = c(VALUES)) |>
+    select(varname, VALUES)
 
 
+  valuelist[which(valuelist %in% "VALUES")]
+  # TODO gör en expand.grid på dessa kombinationer
+
+
+  varnames
+  px$datavec[1:10]
 
   px_obj <- init_empty_px_object()
   px_obj$metadata$metadata <- meta
@@ -383,12 +420,10 @@ create_px_object_from_px_file <- function(file,
 }
 
 #
-xx <- create_px_object_from_px_file("inst/extdata/TEMP02.px")
+#xx <- create_px_object_from_px_file("inst/extdata/TEMP02.px")
 #xx <- create_px_object_from_px_file("inst/extdata/WORK02.px")$meta
 #xx <- create_px_object_from_px_file("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\scb.px")$meta
 
-init_empty_px_object()$metadata$value_codes
-init_empty_px_object()$metadata$variable_codes
 
 
 # variablecode <chr>, language <chr>, variabletype <chr>, variable <chr>

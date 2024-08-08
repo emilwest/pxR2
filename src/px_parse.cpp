@@ -127,14 +127,14 @@ List px_parse(const std::string& filePath, bool only_meta=false, bool debug=fals
 
   std::vector<std::string> lines = preprocess_file(filePath, only_meta);
   bool in_data=false;
-  List metalist;
+  //List metalist;
   std::vector<std::string> datavec;
   int parsedValues = 0;
 
-  // std::vector<std::string> keywords;
-  // std::vector<std::string> languages;
-  // std::vector<std::string> subkeys;
-  // std::vector<std::string> values;
+  std::vector<std::string> keywords;
+  std::vector<std::string> languages;
+  List subkeys_list;
+  List values_list;
 
 
   for(unsigned int i = 0; i < lines.size(); i++) {
@@ -153,17 +153,22 @@ List px_parse(const std::string& filePath, bool only_meta=false, bool debug=fals
     if (!in_data) {
       List x = px_parse_meta_string(s, debug);
 
-      // keywords.push_back(x["keyword"]);
-      // languages.push_back(x["language"]);
-      // subkeys.push_back(x["subkeys"]);
-      // values.push_back(x["values"]);
+      // Convert std::vector<std::string> to CharacterVector
+      CharacterVector r_values = wrap(x["values"]);
+      CharacterVector r_subkeys = wrap(x["subkeys"]);
 
-      DataFrame df = DataFrame::create(Named("keyword")=x["keyword"],
-                                       Named("language")=x["language"],
-                                       Named("subkeys")=stringvec_to_string(x["subkeys"]),
-                                       Named("values")=stringvec_to_string(x["values"])
-      );
-      metalist.push_back(df);
+      keywords.push_back(x["keyword"]);
+      languages.push_back(x["language"]);
+      subkeys_list.push_back(r_subkeys);
+      values_list.push_back(r_values);
+
+
+      // DataFrame df = DataFrame::create(Named("keyword") = x["keyword"],
+      //                                  Named("language") = x["language"],
+      //                                  // Named("subkeys")=stringvec_to_string(x["subkeys"]),
+      //                                  // Named("values")=stringvec_to_string(x["values"])
+      // );
+      // metalist.push_back(df);
     } else {
       std::istringstream iss(s);  // Create an input string stream from the string
       std::string token;
@@ -177,17 +182,19 @@ List px_parse(const std::string& filePath, bool only_meta=false, bool debug=fals
     }
   }
 
-  // DataFrame df = DataFrame::create(Named("keyword", keywords),
-  //                                  Named("language", languages),
-  //                                  Named("subkeys", subkeys),
-  //                                  Named("values", values)
-  // );
 
   if (debug) Rcpp::Rcout << "Parsed values: " << parsedValues << "\n";
 
+  // Set names of subkeys_list and values_list based on keywords
+  subkeys_list.attr("names") = wrap(keywords);
+  values_list.attr("names") = wrap(keywords);
+
   return List::create(
-    Named("meta") = metalist,
-    Named("datavec") = datavec
+    Named("datavec") = datavec,
+    Named("keyword") = wrap(keywords), // converts to CharacterVector
+    Named("language") = wrap(languages),
+    Named("subkeys") = subkeys_list,
+    Named("values") = values_list
   );
 
 }
@@ -197,17 +204,28 @@ List px_parse(const std::string& filePath, bool only_meta=false, bool debug=fals
 
 /*** R
 x <- preprocess_file("inst\\extdata\\TEMP02.px", only_meta = T)
-
-iconv(x, from = "iso-8859-1",to = "UTF-8")
+# iconv(x, from = "iso-8859-1",to = "UTF-8")
 
 x <- px_parse("inst\\extdata\\TEMP02.px")
-# x$meta |> dplyr::bind_rows() |> tibble::as_tibble() |> View()
 x <- px_parse("inst/extdata/WORK02.px")
 
 
 #px_extract_meta_strings("inst/extdata/WORK02.px")
 
 
-#x <- px_parse("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\CHIL03.px")
+x <- px_parse("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\CHIL03.px")
+
 #x <- px_parse("\\\\ivo.local\\Users\\Home$\\emwe\\Downloads\\scb.px")
+
+# x$subkeys |> set_names(x$keyword) |> tibble::enframe() |> unnest_wider(value, names_sep = "_")
+# x$subkeys |> tibble::enframe() |> unnest_wider(value, names_sep = "_")
+#
+# x$values |> tibble::enframe()
+#
+# x$values$STUB
+#
+#
+# bind_cols(keyword=x$keyword, language=x$language, subkeys=tibble::enframe(x$subkeys)) |> View()
+
+
 */

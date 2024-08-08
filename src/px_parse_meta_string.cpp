@@ -477,6 +477,7 @@ px_parse_meta_string("CELLNOTE[sv](\"kön\", \"*\", \"*\", \"ålder\",)=\"Data n
 px_parse_meta_string("CELLNOTE[sv](kön, *, *, ålder,)=\"Data not applicable\";")
 px_parse_meta_string("CHARSET=\"ANSI\";")
 px_parse_meta_string("CHARSET[en]=\"ANSI\";")
+px_parse_meta_string("STUB=\"ålder\",\"kön\";")
 
 px_parse_meta_string("DATA=")
 
